@@ -9,7 +9,7 @@
   </EmptyState>
 */
 
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 
 export type EmptyStateProps = {
   title?: string;

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@hanzo/ui";
 import type { Metadata } from "next";
 import Link from "next/link";
 

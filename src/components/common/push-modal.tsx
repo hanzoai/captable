@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@hanzo/ui";
 import { CaptableLogo } from "@/components/common/logo";
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 
 export type ModalProps = {
   title: string | React.ReactNode;

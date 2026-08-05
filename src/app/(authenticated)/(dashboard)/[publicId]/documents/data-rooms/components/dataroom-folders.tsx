@@ -1,7 +1,6 @@
+import { Button, Card } from "@hanzo/ui";
 import { PageLayout } from "@/components/dashboard/page-layout";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 import type { DataRoom } from "@prisma/client";
 import {
   RiFolder3Fill as FolderIcon,

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 import { withServerComponentSession } from "@/server/auth";
 import { RiArrowLeftLine } from "@remixicon/react";
 import Link from "next/link";

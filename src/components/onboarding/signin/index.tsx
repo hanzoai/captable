@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@hanzo/ui";
 import { signIn } from "next-auth/react";
 import { AuthFormHeader } from "../auth-form-header";
 

@@ -1,5 +1,5 @@
+import { Button } from "@hanzo/ui";
 import EmptyState from "@/components/common/empty-state";
-import { Button } from "@/components/ui/button";
 import { getServerComponentAuthSession } from "@/server/auth";
 import { db } from "@/server/db";
 import { RiAddFill, RiFolderCheckFill } from "@remixicon/react";

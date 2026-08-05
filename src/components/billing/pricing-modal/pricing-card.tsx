@@ -1,12 +1,6 @@
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@hanzo/ui";
+import type { ButtonProps } from "@hanzo/ui";
+import { cn } from "@hanzo/ui";
 import type { PricingPlanInterval } from "@/prisma/enums";
 import { useState } from "react";
 

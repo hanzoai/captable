@@ -1,6 +1,5 @@
+import { Avatar, AvatarImage, Card } from "@hanzo/ui";
 import { APP_NAME } from "@/lib/branding";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
 import Link from "next/link";
 
 type SharePageLayoutProps = {

@@ -3,7 +3,7 @@ import { APP_DESCRIPTION, APP_NAME } from "@/lib/branding";
 import { PublicEnvScript } from "@/components/public-env-script";
 import ScreenSize from "@/components/screen-size";
 import { constants } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 import { NextAuthProvider } from "@/providers/next-auth";
 import { ProgressBarProvider } from "@/providers/progress-bar";
 import { getServerComponentAuthSession } from "@/server/auth";
