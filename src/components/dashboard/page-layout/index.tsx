@@ -14,12 +14,27 @@ export function PageLayout({
   description,
 }: PageLayoutProps) {
   return (
-    <div className="flex flex-col gap-y-3">
-      <div className="flex items-center justify-between gap-y-3 ">
-        <div className="gap-y-3">
-          <h3 className="font-medium">{title}</h3>
+    <div
+      style={{ display: "flex", flexDirection: "column", rowGap: "0.75rem" }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>
+          <h3 style={{ fontWeight: 500 }}>{title}</h3>
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p
+              style={{
+                fontSize: "0.875rem",
+                color: "var(--muted-foreground)",
+              }}
+            >
+              {description}
+            </p>
           )}
         </div>
 

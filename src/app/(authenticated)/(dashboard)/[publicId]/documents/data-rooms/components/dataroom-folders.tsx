@@ -1,6 +1,5 @@
 import { Button, Card } from "@hanzo/ui";
 import { PageLayout } from "@/components/dashboard/page-layout";
-import { cn } from "@hanzo/ui";
 import type { DataRoom } from "@prisma/client";
 import {
   RiFolder3Fill as FolderIcon,
@@ -23,7 +22,7 @@ type FolderProps = {
 
 const Folders = ({ companyPublicId, folders }: FolderProps) => {
   return (
-    <div className="flex flex-col gap-y-3">
+    <div style={{ display: "flex", flexDirection: "column", rowGap: "0.75rem" }}>
       <PageLayout
         title="Data room"
         description="A secure spaces to share multiple documents with investors, stakeholders and external parties."
@@ -31,7 +30,7 @@ const Folders = ({ companyPublicId, folders }: FolderProps) => {
           <DataRoomPopover
             trigger={
               <Button>
-                <RiAddFill className="mr-2 h-5 w-5" />
+                <RiAddFill size={20} style={{ marginRight: "0.5rem" }} />
                 Data room
               </Button>
             }
@@ -39,44 +38,73 @@ const Folders = ({ companyPublicId, folders }: FolderProps) => {
         }
       />
 
-      <hr className="my-3" />
+      <hr style={{ margin: "0.75rem 0" }} />
 
-      <Card className="mt-3 border-none bg-transparent shadow-none">
-        <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+      <Card
+        style={{
+          marginTop: "0.75rem",
+          border: "none",
+          background: "transparent",
+          boxShadow: "none",
+        }}
+      >
+        <ul className="folder-grid">
           {folders.map((folder) => (
             <li key={folder.id}>
               <Link
                 href={`/${companyPublicId}/documents/data-rooms/${folder.publicId}`}
-                className="col-span-1 flex cursor-pointer rounded-md shadow-sm hover:shadow-lg"
+                className="folder-tile"
               >
                 <div
-                  className={cn(
-                    "flex w-14 flex-shrink-0 items-center justify-center rounded-l-md border text-sm font-medium ",
-                  )}
+                  className="center"
+                  style={{
+                    width: "3.5rem",
+                    flexShrink: 0,
+                    borderRadius: "0.375rem 0 0 0.375rem",
+                    border: "1px solid var(--border)",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                  }}
                 >
                   <FolderIcon
-                    className="h-6 w-6 text-primary/70"
+                    size={24}
+                    style={{ color: "var(--primary)", opacity: 0.7 }}
                     aria-hidden="true"
                   />
                 </div>
-                <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-y border-r border-gray-200 bg-white">
-                  <div className="flex-1 truncate px-4 py-2 text-sm">
-                    <span className="font-medium text-gray-900 hover:text-gray-600">
-                      {folder.name}
-                    </span>
-                    <p className="text-gray-500">
+                <div
+                  className="truncate"
+                  style={{
+                    display: "flex",
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    borderRadius: "0 0.375rem 0.375rem 0",
+                    borderTop: "1px solid #e5e7eb",
+                    borderBottom: "1px solid #e5e7eb",
+                    borderRight: "1px solid #e5e7eb",
+                    background: "#fff",
+                  }}
+                >
+                  <div
+                    className="truncate"
+                    style={{
+                      flex: 1,
+                      padding: "0.5rem 1rem",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    <span className="folder-name">{folder.name}</span>
+                    <p style={{ color: "#6b7280" }}>
                       {folder._count.documents === 1
                         ? `${folder._count.documents} file`
                         : `${folder._count.documents} files`}
                     </p>
                   </div>
-                  <div className="flex-shrink-0 pr-2">
-                    <button
-                      type="button"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-transparent focus:ring-offset-2"
-                    >
+                  <div style={{ flexShrink: 0, paddingRight: "0.5rem" }}>
+                    <button type="button" className="icon-btn">
                       <span className="sr-only">Open options</span>
-                      <MoreIcon className="h-5 w-5" aria-hidden="true" />
+                      <MoreIcon size={20} aria-hidden="true" />
                     </button>
                   </div>
                 </div>

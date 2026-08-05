@@ -1,9 +1,16 @@
 import { cn } from "@hanzo/ui";
 
-export const CaptableLogo = ({ className }: { className?: string }) => {
+export const CaptableLogo = ({
+  className,
+  style,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+}) => {
   return (
     <svg
       className={cn(className)}
+      style={style}
       viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

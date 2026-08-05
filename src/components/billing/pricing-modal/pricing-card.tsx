@@ -1,6 +1,5 @@
 import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@hanzo/ui";
 import type { ButtonProps } from "@hanzo/ui";
-import { cn } from "@hanzo/ui";
 import type { PricingPlanInterval } from "@/prisma/enums";
 import { useState } from "react";
 
@@ -43,11 +42,19 @@ export function PricingCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
-        <div className="flex gap-0.5">
-          <h3 className="text-3xl font-bold">{price}</h3>
+        <CardTitle style={{ fontSize: "1.125rem" }}>{title}</CardTitle>
+        <div style={{ display: "flex", gap: "0.125rem" }}>
+          <h3 style={{ fontSize: "1.875rem", fontWeight: 700 }}>{price}</h3>
           {unitAmount !== 0 && (
-            <span className="flex flex-col justify-end text-sm mb-1">
+            <span
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-end",
+                fontSize: "0.875rem",
+                marginBottom: "0.25rem",
+              }}
+            >
               /{humanizedInterval[interval]}
             </span>
           )}
@@ -56,7 +63,6 @@ export function PricingCard({
       </CardHeader>
       <CardFooter>
         <Button
-          className={cn(!active && "bg-teal-500 hover:bg-teal-500/80")}
           {...(active && { variant: "destructive" })}
           onClick={async () => {
             if (handleClick) {

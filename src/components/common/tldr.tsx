@@ -11,30 +11,44 @@ type TldrProps = {
 
 const Tldr = ({ message, cta }: TldrProps) => {
   return (
-    <div className="mt-3 rounded-md bg-teal-50 p-4 text-left">
-      <div className="flex">
-        <div className="flex-shrink-0">
+    <div
+      style={{
+        marginTop: "0.75rem",
+        borderRadius: "0.375rem",
+        background: "#f0fdfa",
+        padding: "1rem",
+        textAlign: "left",
+      }}
+    >
+      <div style={{ display: "flex" }}>
+        <div style={{ flexShrink: 0 }}>
           <RiInformationLine
-            className="h-5 w-5 text-teal-600"
+            size={20}
+            style={{ color: "#0d9488" }}
             aria-hidden="true"
           />
         </div>
-        <div className="ml-3">
-          <div className="text-sm text-teal-600">
+        <div style={{ marginLeft: "0.75rem" }}>
+          <div style={{ fontSize: "0.875rem", color: "#0d9488" }}>
             <p>{message}</p>
           </div>
 
           {cta && (
-            <div className="mt-4">
-              <div className="-mx-2 -my-1.5 flex">
+            <div style={{ marginTop: "1rem" }}>
+              <div
+                style={{
+                  margin: "-0.375rem -0.5rem",
+                  display: "flex",
+                }}
+              >
                 <Link
                   passHref
                   href={cta.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded bg-teal-100 px-2 py-1.5 text-xs font-medium text-teal-700 hover:bg-teal-200 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 focus:ring-offset-teal-50"
+                  className="tldr-cta"
                 >
-                  <span className="mr-1">{cta.label}</span>
+                  <span style={{ marginRight: "0.25rem" }}>{cta.label}</span>
                   <span aria-hidden="true"> &rarr;</span>
                 </Link>
               </div>

@@ -13,23 +13,22 @@ const SignUpForm = () => {
 	}
 
 	return (
-		<div className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-100">
-			<div className="grid w-full max-w-md grid-cols-1 gap-5 rounded-xl border bg-white p-10 shadow">
+		<div className="auth-screen">
+			<div className="auth-card">
 				<AuthFormHeader page="signup" />
-				<Button
-					type="button"
-					onClick={signInWithIAM}
-					className="bg-red-500 hover:bg-red-600 text-white"
-				>
+				<Button type="button" onClick={signInWithIAM}>
 					Sign up with{" "}
-					<span className="font-bold">{IAM_PROVIDER_NAME}</span>
+					<span style={{ fontWeight: 700 }}>{IAM_PROVIDER_NAME}</span>
 				</Button>
-				<span className="text-center text-sm text-gray-500">
+				<span
+					style={{
+						textAlign: "center",
+						fontSize: "0.875rem",
+						color: "#6b7280",
+					}}
+				>
 					Already have an account?{" "}
-					<a
-						href="/login"
-						className="underline underline-offset-4 hover:text-primary"
-					>
+					<a href="/login" className="link-underline">
 						Login
 					</a>
 				</span>

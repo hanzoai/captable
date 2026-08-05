@@ -14,7 +14,7 @@ const EmptyOverview = ({ firstName, publicCompanyId }: EmptyOverviewProps) => {
       icon={<RiPieChartFill />}
       title={`Welcome to ${process.env.NEXT_PUBLIC_APP_NAME || "Hanzo Captable"} ${firstName && `, ${firstName}`} 👋`}
       subtitle={
-        <span className="text-muted-foreground">
+        <span style={{ color: "var(--muted-foreground)" }}>
           We will get you setup with your Captable in no time.
         </span>
       }
@@ -22,7 +22,10 @@ const EmptyOverview = ({ firstName, publicCompanyId }: EmptyOverviewProps) => {
       <Button size="lg">
         <Link href={`/${publicCompanyId}/stakeholders`}>
           Let{`'`}s get started
-          <RiArrowRightLine className="ml-5 inline-block h-4 w-5" />
+          <RiArrowRightLine
+            size={16}
+            style={{ marginLeft: "1.25rem", display: "inline-block" }}
+          />
         </Link>
       </Button>
     </EmptyState>

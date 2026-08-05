@@ -1,5 +1,16 @@
+import { createRequire } from "node:module";
+import path from "node:path";
+
 import withBundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
+
+const require = createRequire(import.meta.url);
+// @hanzo/gui (Tamagui) targets react-native; on web the bare specifier maps to
+// react-native-web. Absolute path so every importer in the pnpm graph hits the
+// same physical copy (one module registry — themes/media live in module state).
+const reactNativeWeb = path.dirname(
+  require.resolve("react-native-web/package.json"),
+);
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -32,6 +43,18 @@ const nextConfig = {
      * Module parse failed: Unexpected character '�' (1:0)" error
      */
     config.resolve.alias.canvas = false;
+    config.resolve.alias["react-native$"] = reactNativeWeb;
+
+    // PREPEND web extensions so react-native packages (react-native-svg via
+    // @hanzogui/lucide-icons-2) resolve their .web.js siblings instead of
+    // fabric NativeComponent files webpack cannot parse.
+    config.resolve.extensions = [
+      ".web.tsx",
+      ".web.ts",
+      ".web.jsx",
+      ".web.js",
+      ...config.resolve.extensions,
+    ];
 
     if (isServer) {
       config.ignoreWarnings = [{ module: /opentelemetry/ }];
@@ -39,16 +62,13 @@ const nextConfig = {
 
     return config;
   },
-  experimental: {
-    instrumentationHook: true,
-    serverComponentsExternalPackages: [
-      "pino",
-      "pino-pretty",
-      "pdf-lib",
-      "@aws-sdk/s3-request-presigner",
-      "@react-pdf/renderer",
-    ],
-  },
+  serverExternalPackages: [
+    "pino",
+    "pino-pretty",
+    "pdf-lib",
+    "@aws-sdk/s3-request-presigner",
+    "@react-pdf/renderer",
+  ],
   eslint: {
     ignoreDuringBuilds: true,
   },

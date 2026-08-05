@@ -9,8 +9,6 @@
   </EmptyState>
 */
 
-import { cn } from "@hanzo/ui";
-
 export type EmptyStateProps = {
   title?: string;
   bordered?: boolean;
@@ -29,28 +27,55 @@ const EmptyState = ({
   error = false,
 }: EmptyStateProps) => {
   return (
-    <div role="alert" className="overflow-hidden">
-      <div className="container mx-auto px-4">
+    <div role="alert" style={{ overflow: "hidden" }}>
+      <div style={{ margin: "0 auto", padding: "0 1rem" }}>
         <div
-          className={cn(
-            bordered && "rounded-xl border",
-            "bg-white px-6 shadow-sm",
-          )}
+          style={{
+            background: "#fff",
+            padding: "0 1.5rem",
+            boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+            ...(bordered && {
+              borderRadius: "0.75rem",
+              border: "1px solid var(--border)",
+            }),
+          }}
         >
-          <div className="mx-auto w-full max-w-2xl py-16 text-center">
+          <div
+            style={{
+              margin: "0 auto",
+              width: "100%",
+              maxWidth: "42rem",
+              padding: "4rem 0",
+              textAlign: "center",
+            }}
+          >
             <div
-              className={cn(
-                "mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full",
-                error ? "bg-rose-100" : "bg-teal-100",
-              )}
+              className="center"
+              style={{
+                margin: "0 auto 1.5rem",
+                height: "4rem",
+                width: "4rem",
+                borderRadius: "9999px",
+                background: error ? "#ffe4e6" : "#ccfbf1",
+              }}
             >
-              <span className={cn(error ? "text-rose-500" : "text-teal-500")}>
+              <span style={{ color: error ? "#f43f5e" : "#14b8a6" }}>
                 {icon}
               </span>
             </div>
 
-            {title && <h3 className="mb-5 text-3xl font-semibold">{title}</h3>}
-            <p className="mb-6">{subtitle}</p>
+            {title && (
+              <h3
+                style={{
+                  marginBottom: "1.25rem",
+                  fontSize: "1.875rem",
+                  fontWeight: 600,
+                }}
+              >
+                {title}
+              </h3>
+            )}
+            <p style={{ marginBottom: "1.5rem" }}>{subtitle}</p>
             {children}
           </div>
         </div>

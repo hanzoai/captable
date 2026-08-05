@@ -1,5 +1,5 @@
-import { COLORS } from "@/constants/esign";
-import { cn } from "@hanzo/ui";
+import { COLORS, FIELD_FILL_ALPHA } from "@/constants/esign";
+
 interface DrawingFieldProps {
   color: string;
   left: number;
@@ -15,14 +15,15 @@ export function DrawingField({
   top,
   width,
 }: DrawingFieldProps) {
+  const c = COLORS[color as keyof typeof COLORS];
+
   return (
     <div
-      className={cn(
-        "absolute overflow-visible border-2 bg-opacity-30",
-        COLORS[color as keyof typeof COLORS]?.border,
-        COLORS[color as keyof typeof COLORS]?.bg,
-      )}
       style={{
+        position: "absolute",
+        overflow: "visible",
+        border: `2px solid ${c}`,
+        background: c && `${c}${FIELD_FILL_ALPHA}`,
         left,
         top,
         width,

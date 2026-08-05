@@ -1,9 +1,12 @@
 "use client";
 
-
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@hanzo/ui";
+import {
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@hanzo/ui";
 import { CaptableLogo } from "@/components/common/logo";
-import { cn } from "@hanzo/ui";
 
 export type ModalProps = {
   title: string | React.ReactNode;
@@ -11,6 +14,17 @@ export type ModalProps = {
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl";
   children: React.ReactNode;
   scrollable?: boolean;
+};
+
+const maxWidths: Record<NonNullable<ModalProps["size"]>, string> = {
+  sm: "24rem",
+  md: "28rem",
+  lg: "32rem",
+  xl: "36rem",
+  "2xl": "42rem",
+  "3xl": "48rem",
+  "4xl": "56rem",
+  "5xl": "64rem",
 };
 
 const Modal = ({
@@ -22,33 +36,41 @@ const Modal = ({
 }: ModalProps) => {
   return (
     <DialogContent
-      className={cn(
-        "mb-10 mt-10 gap-0 bg-white p-0",
-        size === "sm" && "sm:max-w-sm",
-        size === "md" && "sm:max-w-md",
-        size === "lg" && "sm:max-w-lg",
-        size === "xl" && "sm:max-w-xl",
-        size === "2xl" && "sm:max-w-2xl",
-        size === "3xl" && "sm:max-w-3xl",
-        size === "4xl" && "sm:max-w-4xl",
-        size === "5xl" && "sm:max-w-5xl",
-      )}
+      style={{
+        margin: "2.5rem 0",
+        gap: 0,
+        background: "#fff",
+        padding: 0,
+        maxWidth: maxWidths[size],
+      }}
     >
       <div
-        className={cn(
-          "no-scrollbar max-h-[80vh]",
-          scrollable ? "overflow-scroll" : "",
-        )}
+        className="no-scrollbar"
+        style={{
+          maxHeight: "80vh",
+          overflow: scrollable ? "scroll" : undefined,
+        }}
       >
-        <header className="border-b border-gray-200 p-5">
-          <div className="">
+        <header
+          style={{ borderBottom: "1px solid #e5e7eb", padding: "1.25rem" }}
+        >
+          <div>
             <DialogHeader>
-              <div className="flex justify-center">
-                <CaptableLogo className="mb-3 h-10 w-10 rounded" />
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <CaptableLogo
+                  style={{
+                    marginBottom: "0.75rem",
+                    height: "2.5rem",
+                    width: "2.5rem",
+                    borderRadius: "0.25rem",
+                  }}
+                />
               </div>
-              <DialogTitle className="mb-4 text-center">{title}</DialogTitle>
+              <DialogTitle style={{ marginBottom: "1rem", textAlign: "center" }}>
+                {title}
+              </DialogTitle>
               {subtitle && (
-                <DialogDescription className="text-center">
+                <DialogDescription style={{ textAlign: "center" }}>
                   {subtitle}
                 </DialogDescription>
               )}
@@ -56,8 +78,8 @@ const Modal = ({
           </div>
         </header>
 
-        <section className=" bg-gray-100 px-8 py-5">
-          <div className="">{children}</div>
+        <section style={{ background: "#f3f4f6", padding: "1.25rem 2rem" }}>
+          <div>{children}</div>
         </section>
       </div>
     </DialogContent>

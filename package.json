@@ -90,6 +90,7 @@
     "react-dropzone": "^14.2.3",
     "react-email": "3.0.1",
     "react-hook-form": "^7.52.1",
+    "react-native-svg": "15.15.5",
     "react-native-web": "^0.21.0",
     "react-number-format": "^5.3.4",
     "react-pdf": "^8.0.2",

@@ -9,7 +9,7 @@ const OfficeViewer = ({ url }: OfficeViewerProps) => {
       src={`https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
         url,
       )}`}
-      className="w-full h-full min-h-screen"
+      style={{ width: "100%", height: "100%", minHeight: "100vh", border: 0 }}
     />
   );
 };

@@ -14,11 +14,11 @@ const LoginWithGoogle = () => {
       type="button"
       size="xl"
       onClick={signInWithGoogle}
-      className="rounded-xl"
+      style={{ borderRadius: "0.75rem" }}
     >
-      <GoogleIcon className="mr-2 h-6 w-6" />
-      <span className="text-lg">
-        Continue with <span className="font-bold">Google</span>
+      <GoogleIcon size={24} style={{ marginRight: "0.5rem" }} />
+      <span style={{ fontSize: "1.125rem" }}>
+        Continue with <span style={{ fontWeight: 700 }}>Google</span>
       </span>
     </Button>
   );

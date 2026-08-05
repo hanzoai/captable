@@ -50,12 +50,10 @@ const VerifyEmail = ({ token }: { token: string }) => {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-100">
-        <div className="grid w-full max-w-md grid-cols-1 gap-5 rounded-xl border bg-white p-10 shadow">
-          <div className="flex flex-col gap-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Verifying...
-            </h1>
+      <div className="auth-screen">
+        <div className="auth-card">
+          <div className="auth-head">
+            <h1 className="auth-title">Verifying...</h1>
           </div>
         </div>
       </div>
@@ -63,47 +61,53 @@ const VerifyEmail = ({ token }: { token: string }) => {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-100">
-      <div className="grid w-full max-w-md grid-cols-1 gap-5 rounded-xl border bg-white p-10 shadow">
-        <div className="flex flex-col gap-y-2 text-center">
+    <div className="auth-screen">
+      <div className="auth-card">
+        <div className="auth-head">
           {success ? (
             <>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-teal-100">
-                <span className="text-teal-500">
-                  <RiMailCheckLine className="h-6 w-auto" />
+              <div
+                className="center"
+                style={{
+                  margin: "0 auto 1.5rem",
+                  height: "4rem",
+                  width: "4rem",
+                  borderRadius: "9999px",
+                  background: "#ccfbf1",
+                }}
+              >
+                <span style={{ color: "#14b8a6" }}>
+                  <RiMailCheckLine size={24} />
                 </span>
               </div>
-              <h1 className="text-2xl font-semibold tracking-tight">
-                {success}
-              </h1>
-              <div className="mb-2 text-center text-sm text-muted-foreground">
+              <h1 className="auth-title">{success}</h1>
+              <div className="auth-sub">
                 Your account has been verified. Please login to continue.
               </div>
             </>
           ) : (
             <>
-              <RiMailCloseLine className="mb-1 h-10 w-auto" />
-              <h1 className="text-2xl font-semibold tracking-tight">
-                Verification Failed
-              </h1>
-              <div className="mb-2 text-center text-sm text-muted-foreground">
-                {error}
-              </div>
+              <RiMailCloseLine
+                size={40}
+                style={{ marginBottom: "0.25rem", alignSelf: "center" }}
+              />
+              <h1 className="auth-title">Verification Failed</h1>
+              <div className="auth-sub">{error}</div>
             </>
           )}
 
           {success ? (
-            <Link href="/signin" className="mt-4">
+            <Link href="/signin" style={{ marginTop: "1rem" }}>
               <Button size="lg">
                 Continue to Login page
-                <RiArrowRightLine className="ml-2 h-4 w-4" />
+                <RiArrowRightLine size={16} style={{ marginLeft: "0.5rem" }} />
               </Button>
             </Link>
           ) : (
-            <Link href="/signup" className="mt-4">
+            <Link href="/signup" style={{ marginTop: "1rem" }}>
               <Button size="lg">
                 Try signing up again
-                <RiArrowRightLine className="ml-2 h-4 w-4" />
+                <RiArrowRightLine size={16} style={{ marginLeft: "0.5rem" }} />
               </Button>
             </Link>
           )}

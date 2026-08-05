@@ -13,15 +13,12 @@ const SignInForm = () => {
 	}
 
 	return (
-		<div className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-100">
-			<div className="grid w-full max-w-md grid-cols-1 gap-5 rounded-xl border bg-white p-10 shadow">
+		<div className="auth-screen">
+			<div className="auth-card">
 				<AuthFormHeader page="signin" />
-				<Button
-					type="button"
-					onClick={signInWithIAM}
-					className="bg-red-500 hover:bg-red-600 text-white"
-				>
-					Sign in with <span className="font-bold">{IAM_PROVIDER_NAME}</span>
+				<Button type="button" onClick={signInWithIAM}>
+					Sign in with{" "}
+					<span style={{ fontWeight: 700 }}>{IAM_PROVIDER_NAME}</span>
 				</Button>
 			</div>
 		</div>
