@@ -1,7 +1,15 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@hanzo/ui";
-import { COLORS } from "@/constants/esign";
+import { COLORS, FIELD_FILL_ALPHA } from "@/constants/esign";
 import { cn } from "@hanzo/ui";
 import type { ComponentProps, ReactNode } from "react";
+
+const fieldPaint = (color: string): React.CSSProperties => {
+  const c = COLORS[color as keyof typeof COLORS];
+  return {
+    border: `2px solid ${c}`,
+    background: c && `${c}${FIELD_FILL_ALPHA}`,
+  };
+};
 
 interface useMeasurementProps {
   currentViewportHeight: number;
@@ -69,13 +77,15 @@ export function ReadOnlyTemplateFieldContainer({
   });
   return (
     <div
-      className={cn(
-        "group absolute z-20 flex cursor-pointer items-center overflow-hidden border-2 bg-opacity-30",
-        COLORS[color as keyof typeof COLORS]?.border,
-        COLORS[color as keyof typeof COLORS]?.bg,
-        className,
-      )}
+      className={cn(className)}
       style={{
+        position: "absolute",
+        zIndex: 20,
+        display: "flex",
+        cursor: "pointer",
+        alignItems: "center",
+        overflow: "hidden",
+        ...fieldPaint(color),
         left: newLeft,
         top: newTop,
         width: newWidth,
@@ -129,13 +139,13 @@ export function TemplateFieldContainer({
     <Popover defaultOpen>
       <PopoverTrigger asChild>
         <button
-          className={cn(
-            `group absolute z-20 cursor-pointer rounded border-2 bg-opacity-30`,
-            COLORS[color as keyof typeof COLORS]?.border,
-            COLORS[color as keyof typeof COLORS]?.bg,
-            className,
-          )}
+          className={cn(className)}
           style={{
+            position: "absolute",
+            zIndex: 20,
+            cursor: "pointer",
+            borderRadius: "0.25rem",
+            ...fieldPaint(color),
             left: newLeft,
             top: newTop,
             width: newWidth,

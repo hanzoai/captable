@@ -49,7 +49,7 @@ const DataRoomPage = async () => {
             <DataRoomPopover
               trigger={
                 <Button>
-                  <RiAddFill className="mr-2 h-5 w-5" />
+                  <RiAddFill size={20} style={{ marginRight: "0.5rem" }} />
                   Create a data room
                 </Button>
               }

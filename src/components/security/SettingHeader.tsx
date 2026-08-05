@@ -1,4 +1,3 @@
-import { cn } from "@hanzo/ui";
 import { withServerComponentSession } from "@/server/auth";
 import { RiArrowLeftLine } from "@remixicon/react";
 import Link from "next/link";
@@ -9,7 +8,7 @@ type SettingsHeaderProps = {
   subtitle: string;
   showBackArrow?: boolean;
   children?: React.ReactNode;
-  className?: string;
+  style?: React.CSSProperties;
 };
 
 export const SettingsHeader = async ({
@@ -17,30 +16,50 @@ export const SettingsHeader = async ({
   title,
   subtitle,
   showBackArrow = true,
-  className,
+  style,
 }: SettingsHeaderProps) => {
   const session = await withServerComponentSession();
 
   const href = `/${session?.user.companyPublicId}/settings/security`;
   return (
-    <>
-      <div
-        className={cn("flex flex-row items-center justify-between", className)}
-      >
-        <div>
-          <div className="flex flex-row items-center justify-start space-x-1">
-            {showBackArrow && (
-              <Link href={href}>
-                <RiArrowLeftLine className="space-x-3 text-slate-800" />
-              </Link>
-            )}
-            <h3 className="text-lg font-medium">{title}</h3>
-          </div>
-
-          <p className="text-muted-foreground text-sm md:mt-2">{subtitle}</p>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        ...style,
+      }}
+    >
+      <div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: "0.25rem",
+          }}
+        >
+          {showBackArrow && (
+            <Link href={href}>
+              <RiArrowLeftLine style={{ color: "#1e293b" }} />
+            </Link>
+          )}
+          <h3 style={{ fontSize: "1.125rem", fontWeight: 500 }}>{title}</h3>
         </div>
-        {children}
+
+        <p
+          style={{
+            color: "var(--muted-foreground)",
+            fontSize: "0.875rem",
+            marginTop: "0.5rem",
+          }}
+        >
+          {subtitle}
+        </p>
       </div>
-    </>
+      {children}
+    </div>
   );
 };

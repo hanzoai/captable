@@ -60,29 +60,34 @@ const TeamMemberUploader = ({ setOpen }: TeamMemberUploaderType) => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="text-sm leading-6 text-neutral-600">
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+    >
+      <div
+        style={{
+          fontSize: "0.875rem",
+          lineHeight: "1.5rem",
+          color: "#525252",
+        }}
+      >
         Please download the{" "}
         <Link
           download
           href="/sample-csv/captable-team-members-template.csv"
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded bg-gray-300/70 px-2 py-1 text-xs font-medium hover:bg-gray-400/50"
+          className="pill-link"
         >
-          <span className="mr-1">sample csv file</span>
+          <span style={{ marginRight: "0.25rem" }}>sample csv file</span>
           <span aria-hidden="true"> &darr;</span>
         </Link>
         , complete and upload it to import your existing or new team members.
       </div>
 
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-      <div
-        className="flex h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-gray-300"
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <RiUploadLine className="h-7 w-7 text-neutral-500" />
-        <span className="text-sm text-neutral-500">
+      <div className="upload-drop" onClick={() => fileInputRef.current?.click()}>
+        <RiUploadLine size={28} />
+        <span style={{ fontSize: "0.875rem" }}>
           {csvFile.length !== 0 ? csvFile[0]?.name : "Click here to import"}
         </span>
         <input
@@ -94,19 +99,19 @@ const TeamMemberUploader = ({ setOpen }: TeamMemberUploaderType) => {
         />
       </div>
 
-      <div className="text-xs">
+      <div style={{ fontSize: "0.75rem" }}>
         <Link
           target="_blank"
           rel="noopener noreferrer"
           href={""}
-          className="text-teal-700 underline"
+          style={{ color: "#0f766e", textDecoration: "underline" }}
         >
           Learn more
         </Link>{" "}
         about the sample csv format
       </div>
 
-      <Button onClick={onImport} className="ml-auto block">
+      <Button onClick={onImport} style={{ marginLeft: "auto", display: "block" }}>
         Import
       </Button>
     </div>

@@ -37,7 +37,7 @@ export default async function RootLayout({
       <head>
         <PublicEnvScript />
       </head>
-      <body className="min-h-screen">
+      <body style={{ minHeight: "100vh" }}>
         <ProgressBarProvider>
           <NextAuthProvider session={session}>
             <TRPCReactProvider cookies={cookies().toString()}>

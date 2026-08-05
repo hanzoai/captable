@@ -49,30 +49,35 @@ const DataRoomPopover = ({ trigger }: DataRoomPopoverType) => {
     <Popover>
       {loading && <Loading />}
       <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent style={{ width: "20rem" }}>
         <form
-          className="flex flex-col gap-2"
+          style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
           onSubmit={async (e) => {
             e.preventDefault();
             await saveDataRoom();
           }}
         >
           <Label htmlFor="data-room-name">Data room name</Label>
-          <p className="text-sm text-muted-foreground">
+          <p
+            style={{
+              fontSize: "0.875rem",
+              color: "var(--muted-foreground)",
+            }}
+          >
             Start by giving your data room a name.
           </p>
           <Input
             id="data-room-name"
-            className="col-span-2 h-8"
+            style={{ height: "2rem" }}
             onChange={(e) => {
               setName(e.target.value);
             }}
           />
 
-          <div className="flex justify-end">
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button size="sm" variant={"secondary"} type="submit">
               Continue
-              <ArrowRightIcon className="ml-2 h-4 w-4" />
+              <ArrowRightIcon size={16} style={{ marginLeft: "0.5rem" }} />
             </Button>
           </div>
         </form>

@@ -18,28 +18,46 @@ export const SharePageLayout = ({
   medium,
   children,
 }: SharePageLayoutProps) => (
-  <div className="flex min-h-screen justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-100 px-5 pb-5 pt-12">
-    <div className="mx-auto flex w-[1080px] max-w-sm flex-col sm:max-w-4xl">
-      <div className="mb-16 flex items-center gap-3">
-        <Avatar className="h-12 w-12 rounded">
+  <div className="share-screen">
+    <div className="share-frame">
+      <div
+        style={{
+          marginBottom: "4rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+        }}
+      >
+        <Avatar
+          style={{ height: "3rem", width: "3rem", borderRadius: "0.25rem" }}
+        >
           <AvatarImage src={company.logo || "/placeholders/company.svg"} />
         </Avatar>
 
-        <span className="text-lg font-semibold">{company.name}</span>
+        <span style={{ fontSize: "1.125rem", fontWeight: 600 }}>
+          {company.name}
+        </span>
       </div>
 
-      <div className="mb-5">{title}</div>
+      <div style={{ marginBottom: "1.25rem" }}>{title}</div>
 
-      <Card className="p-10">{children}</Card>
+      <Card style={{ padding: "2.5rem" }}>{children}</Card>
 
-      <div className="my-10 text-center text-sm text-muted-foreground">
+      <div
+        style={{
+          margin: "2.5rem 0",
+          textAlign: "center",
+          fontSize: "0.875rem",
+          color: "var(--muted-foreground)",
+        }}
+      >
         <p>
           Powered by{" "}
           <Link
             href={`${process.env.NEXT_PUBLIC_APP_URL || "https://captable.hanzo.ai"}?utm_source=${company.name}&utm_medium=${medium}&utm_campaign=powered_by`}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold text-teal-500 hover:underline"
+            className="share-powered"
           >
             {APP_NAME}
           </Link>

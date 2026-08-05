@@ -17,17 +17,45 @@ export function UserDropdown({ companyPublicId }: UserDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-9 w-9 rounded-full">
+        <Button
+          variant="ghost"
+          style={{
+            position: "relative",
+            height: "2rem",
+            width: "2rem",
+            borderRadius: "9999px",
+          }}
+        >
+          <Avatar
+            style={{
+              height: "2.25rem",
+              width: "2.25rem",
+              borderRadius: "9999px",
+            }}
+          >
             <AvatarImage src={image || "/placeholders/user.svg"} />
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{name}</p>
-            <p className="text-xs leading-none text-muted-foreground">
+      <DropdownMenuContent style={{ width: "14rem" }} align="end" forceMount>
+        <DropdownMenuLabel style={{ fontWeight: 400 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.25rem",
+            }}
+          >
+            <p style={{ fontSize: "0.875rem", fontWeight: 500, lineHeight: 1 }}>
+              {name}
+            </p>
+            <p
+              style={{
+                fontSize: "0.75rem",
+                lineHeight: 1,
+                color: "var(--muted-foreground)",
+              }}
+            >
               {email}
             </p>
           </div>

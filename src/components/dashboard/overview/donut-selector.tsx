@@ -25,10 +25,19 @@ const DonutSelector: React.FC<DonutSelectorProps> = ({
       }}
     >
       <SelectTrigger
-        className={cn(
-          "text-normal -ml-2 h-5 w-[133px] cursor-pointer rounded border-none bg-transparent font-semibold text-primary underline",
-          className,
-        )}
+        className={cn(className)}
+        style={{
+          marginLeft: "-0.5rem",
+          height: "1.25rem",
+          width: 133,
+          cursor: "pointer",
+          borderRadius: "0.25rem",
+          border: "none",
+          background: "transparent",
+          fontWeight: 600,
+          color: "var(--primary)",
+          textDecoration: "underline",
+        }}
       >
         <SelectValue placeholder="Select the type" />
       </SelectTrigger>

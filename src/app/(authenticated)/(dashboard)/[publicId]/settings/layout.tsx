@@ -6,12 +6,12 @@ import { IS_BILLING_ENABLED } from "@/constants/stripe";
 const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <PageLayout title="Settings">
-      <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-12 md:col-span-3">
+      <div className="settings-grid">
+        <div>
           <SettingsSidebar isBillingEnabled={IS_BILLING_ENABLED} />
         </div>
-        <div className="col-span-12 md:col-span-9">
-          <Card className="p-5">{children}</Card>
+        <div>
+          <Card style={{ padding: "1.25rem" }}>{children}</Card>
         </div>
       </div>
     </PageLayout>

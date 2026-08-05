@@ -6,6 +6,20 @@ import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import LoginWithGoogle from "./components/LoginWithGoogle";
 
+const check = (
+  <CheckIcon
+    size={20}
+    style={{
+      display: "inline-block",
+      marginBottom: "0.25rem",
+      color: "#22c55e",
+    }}
+  />
+);
+
+const li: React.CSSProperties = { marginBottom: "0.25rem" };
+const item: React.CSSProperties = { marginLeft: "0.5rem" };
+
 export default async function CapPage() {
   if (env.NEXTAUTH_URL && !env.NEXTAUTH_URL.includes("captable.hanzo.ai")) {
     return notFound();
@@ -18,34 +32,34 @@ export default async function CapPage() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-100">
-      <div className="grid w-full max-w-lg grid-cols-1 gap-5 rounded-xl border bg-white/10 p-10 shadow-sm hover:shadow-md">
-        <h3 className="-mt-5">
-          cap.<span className="text-2xl text-gray-600">new</span>
+    <div className="auth-screen">
+      <div
+        className="auth-card"
+        style={{ maxWidth: "32rem", background: "rgb(255 255 255 / 0.1)" }}
+      >
+        <h3 style={{ marginTop: "-1.25rem" }}>
+          cap.
+          <span style={{ fontSize: "1.5rem", color: "#4b5563" }}>new</span>
         </h3>
         <ul>
-          <li className="mb-1">
-            <CheckIcon className="inline-block w-5 h-5 mb-1 text-green-500" />
-            <span className="ml-2">Manage your Cap table, issue options</span>
+          <li style={li}>
+            {check}
+            <span style={item}>Manage your Cap table, issue options</span>
           </li>
-          <li className="mb-1">
-            <CheckIcon className="inline-block w-5 h-5 mb-1 text-green-500" />
-            <span className="ml-2">
-              Collaborate with investors with Data rooms
-            </span>
+          <li style={li}>
+            {check}
+            <span style={item}>Collaborate with investors with Data rooms</span>
           </li>
-          <li className="mb-1">
-            <CheckIcon className="inline-block w-5 h-5 mb-1 text-green-500" />
-            <span className="ml-2">eSign NDAs, SAFEs and other documents</span>
+          <li style={li}>
+            {check}
+            <span style={item}>eSign NDAs, SAFEs and other documents</span>
           </li>
-          <li className="mb-1">
-            <CheckIcon className="inline-block w-5 h-5 mb-1 text-green-500" />
-            <span className="ml-2">
-              Delight your investors by sending updates
-            </span>
+          <li style={li}>
+            {check}
+            <span style={item}>Delight your investors by sending updates</span>
           </li>
         </ul>
-        <span className="text-xl">Login to get started</span>
+        <span style={{ fontSize: "1.25rem" }}>Login to get started</span>
         <LoginWithGoogle />
       </div>
     </div>

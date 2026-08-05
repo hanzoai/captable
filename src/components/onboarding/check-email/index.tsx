@@ -32,22 +32,32 @@ const CheckEmailComponent = () => {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-100">
-      <div className="grid w-full max-w-md grid-cols-1 gap-5 rounded-xl border bg-white p-10 shadow">
-        <div className="flex flex-col gap-y-2 text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-teal-100">
-            <span className="text-teal-500">
-              <RiMailLine className="h-6 w-auto" />
+    <div className="auth-screen">
+      <div className="auth-card">
+        <div className="auth-head">
+          <div
+            className="center"
+            style={{
+              margin: "0 auto 1.5rem",
+              height: "4rem",
+              width: "4rem",
+              borderRadius: "9999px",
+              background: "#ccfbf1",
+            }}
+          >
+            <span style={{ color: "#14b8a6" }}>
+              <RiMailLine size={24} />
             </span>
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Check your email
-          </h1>
+          <h1 className="auth-title">Check your email</h1>
         </div>
-        <div className="mb-2 text-center">
+        <div style={{ marginBottom: "0.5rem", textAlign: "center" }}>
           We&apos;ve sent an email to
-          <span className="text-sm font-bold"> {email} </span>. Please click the
-          link in the email to verify your account.
+          <span style={{ fontSize: "0.875rem", fontWeight: 700 }}>
+            {" "}
+            {email}{" "}
+          </span>
+          . Please click the link in the email to verify your account.
         </div>
         <Button onClick={Resend} disabled={!email} loading={isLoading}>
           Resend verification email

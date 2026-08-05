@@ -98,7 +98,7 @@ export function SettingsSidebar({ isBillingEnabled }: SettingsSidebarProps) {
   const companyPublicId = data?.user.companyPublicId;
 
   return (
-    <ul className="text-sm">
+    <ul style={{ fontSize: "0.875rem", listStyle: "none", padding: 0 }}>
       {companyNav.map((item) => {
         const href = `/${companyPublicId}${item.href}`;
         const isActive = currentPath === href;
@@ -108,7 +108,10 @@ export function SettingsSidebar({ isBillingEnabled }: SettingsSidebarProps) {
         }
 
         return (
-          <li key={item.name} className="rounded py-1">
+          <li
+            key={item.name}
+            style={{ borderRadius: "0.25rem", padding: "0.25rem 0" }}
+          >
             <NavLink
               active={isActive}
               name={item.name}
@@ -119,7 +122,15 @@ export function SettingsSidebar({ isBillingEnabled }: SettingsSidebarProps) {
         );
       })}
 
-      <div className="mt-3 text-xs font-semibold leading-6 text-gray-400">
+      <div
+        style={{
+          marginTop: "0.75rem",
+          fontSize: "0.75rem",
+          fontWeight: 600,
+          lineHeight: "1.5rem",
+          color: "#9ca3af",
+        }}
+      >
         Account
       </div>
 
@@ -128,7 +139,10 @@ export function SettingsSidebar({ isBillingEnabled }: SettingsSidebarProps) {
         const isActive = currentPath.includes(href) || currentPath === href;
 
         return (
-          <li key={item.name} className="rounded py-1">
+          <li
+            key={item.name}
+            style={{ borderRadius: "0.25rem", padding: "0.25rem 0" }}
+          >
             <NavLink
               active={isActive}
               name={item.name}

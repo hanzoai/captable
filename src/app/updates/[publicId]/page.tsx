@@ -74,10 +74,18 @@ const PublicUpdatePage = async ({
 
   if (!canRenderInPublic) {
     return (
-      <div className="h-screen w-full flex justify-center items-center">
-        <div className="flex items-center space-x-5">
-          <RiLock2Line className="h-10 w-10" />
-          <p className="text-lg font-semibold text-gray-600">
+      <div className="center" style={{ height: "100vh", width: "100%" }}>
+        <div
+          style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}
+        >
+          <RiLock2Line size={40} />
+          <p
+            style={{
+              fontSize: "1.125rem",
+              fontWeight: 600,
+              color: "#4b5563",
+            }}
+          >
             Public access denied
           </p>
         </div>
@@ -109,28 +117,48 @@ const PublicUpdatePage = async ({
       }}
       title={
         <Fragment>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {update.title}
-          </h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="auth-title">{update.title}</h1>
+          <p
+            style={{
+              fontSize: "0.875rem",
+              color: "var(--muted-foreground)",
+            }}
+          >
             Last updated {dayjsExt().to(update.updatedAt)}
           </p>
         </Fragment>
       }
     >
       <Fragment>
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 rounded-full">
+        <div
+          style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
+        >
+          <Avatar
+            style={{
+              height: "2.5rem",
+              width: "2.5rem",
+              borderRadius: "9999px",
+            }}
+          >
             <AvatarImage src={author.user.image || "/placeholders/user.svg"} />
           </Avatar>
 
           <div>
-            <p className="text-lg font-semibold">{author.user.name}</p>
-            <p className="text-sm text-muted-foreground">{author.title}</p>
+            <p style={{ fontSize: "1.125rem", fontWeight: 600 }}>
+              {author.user.name}
+            </p>
+            <p
+              style={{
+                fontSize: "0.875rem",
+                color: "var(--muted-foreground)",
+              }}
+            >
+              {author.title}
+            </p>
           </div>
         </div>
 
-        <div className="mt-5">
+        <div style={{ marginTop: "1.25rem" }}>
           <article
             className="prose"
             //biome-ignore lint/security/noDangerouslySetInnerHtml: allow dangerouslySetInnerHtml

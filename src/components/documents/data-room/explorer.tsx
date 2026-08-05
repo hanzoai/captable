@@ -1,6 +1,5 @@
 import { Card } from "@hanzo/ui";
 import FileIcon from "@/components/common/file-icon";
-import { cn } from "@hanzo/ui";
 import type { Bucket } from "@prisma/client";
 import Link from "next/link";
 
@@ -20,8 +19,10 @@ const DataRoomFileExplorer = ({
   dataRoomPublicId,
 }: DocumentExplorerProps) => {
   return (
-    <Card className="border-none bg-transparent shadow-none">
-      <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+    <Card
+      style={{ border: "none", background: "transparent", boxShadow: "none" }}
+    >
+      <ul className="folder-grid">
         {documents.map((document) => (
           <li key={document.id}>
             <Link
@@ -30,21 +31,41 @@ const DataRoomFileExplorer = ({
                   ? `/data-rooms/${dataRoomPublicId}/${document.id}?token=${jwtToken}`
                   : `/${companyPublicId}/documents/${document.id}`
               }
-              className="col-span-1 flex cursor-pointer rounded-md transition duration-150 ease-in-out hover:shadow-md"
+              className="folder-tile"
             >
               <div
-                className={cn(
-                  "flex w-14 flex-shrink-0 items-center justify-center rounded-l-md border text-sm font-medium ",
-                )}
+                className="center"
+                style={{
+                  width: "3.5rem",
+                  flexShrink: 0,
+                  borderRadius: "0.375rem 0 0 0.375rem",
+                  border: "1px solid var(--border)",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                }}
               >
                 <FileIcon type={document.mimeType} />
               </div>
-              <div className="flex flex-1 items-center justify-between truncate rounded-r-md border-y border-r border-gray-200 bg-white">
-                <div className="text-md flex-1 truncate px-4 py-2">
-                  <span className="font-medium text-gray-900 hover:text-gray-600">
-                    {document.name}
-                  </span>
-                  <p className="text-xs text-gray-500">{`${
+              <div
+                className="truncate"
+                style={{
+                  display: "flex",
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderRadius: "0 0.375rem 0.375rem 0",
+                  borderTop: "1px solid #e5e7eb",
+                  borderBottom: "1px solid #e5e7eb",
+                  borderRight: "1px solid #e5e7eb",
+                  background: "#fff",
+                }}
+              >
+                <div
+                  className="truncate"
+                  style={{ flex: 1, padding: "0.5rem 1rem" }}
+                >
+                  <span className="folder-name">{document.name}</span>
+                  <p style={{ fontSize: "0.75rem", color: "#6b7280" }}>{`${
                     document.mimeType
                   } - ${(document.size / 1024 / 1024).toFixed(2)} MB`}</p>
                 </div>

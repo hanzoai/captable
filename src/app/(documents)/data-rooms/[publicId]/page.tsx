@@ -78,14 +78,22 @@ const DataRoomPage = async ({
         logo: company.logo,
       }}
       title={
-        <div className="flex">
+        <div style={{ display: "flex" }}>
           <FolderIcon
-            className="mr-3 mt-1 h-6 w-6 text-primary/60"
+            size={24}
+            style={{
+              marginRight: "0.75rem",
+              marginTop: "0.25rem",
+              color: "var(--primary)",
+              opacity: 0.6,
+            }}
             aria-hidden="true"
           />
 
-          <h1 className="text-2xl font-semibold tracking-tight">
-            <span className="text-primary/60">Data room / </span>
+          <h1 className="auth-title">
+            <span style={{ color: "var(--primary)", opacity: 0.6 }}>
+              Data room /{" "}
+            </span>
             {dataRoom.name}
           </h1>
         </div>

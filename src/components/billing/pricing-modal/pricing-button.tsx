@@ -15,11 +15,27 @@ export function PricingButton({
 }: PricingButtonProps) {
   return (
     <button
-      className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        active && "bg-background text-foreground shadow-sm",
-        className,
-      )}
+      className={cn(className)}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        whiteSpace: "nowrap",
+        borderRadius: "0.125rem",
+        border: "none",
+        cursor: "pointer",
+        padding: "0.375rem 0.75rem",
+        fontSize: "0.875rem",
+        fontWeight: 500,
+        transition: "all 0.15s ease",
+        ...(active
+          ? {
+              background: "var(--background)",
+              color: "var(--foreground)",
+              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+            }
+          : { background: "transparent", color: "inherit" }),
+      }}
       {...rest}
     >
       {label}
