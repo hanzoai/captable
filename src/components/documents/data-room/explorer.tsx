@@ -1,6 +1,6 @@
+import { Card } from "@hanzo/ui";
 import FileIcon from "@/components/common/file-icon";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 import type { Bucket } from "@prisma/client";
 import Link from "next/link";
 

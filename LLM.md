@@ -8,7 +8,7 @@ Captable, Inc. is an open-source cap table management platform designed as an al
 - **Database**: PostgreSQL with Prisma ORM
 - **API**: tRPC for type-safe APIs
 - **Authentication**: NextAuth with Passkey support
-- **Styling**: Tailwind CSS with shadcn/ui components
+- **Styling**: `@hanzo/ui` components on `@hanzo/gui` + CSS custom properties from `@hanzo/ui/theme.css`. No Tailwind, no Radix, no vendored shadcn.
 - **Email**: React Email with Nodemailer
 - **File Storage**: AWS S3 compatible (Hanzo S3 for local dev — `ghcr.io/hanzoai/s3`, API on :9000, no console)
 - **Payments**: Stripe integration

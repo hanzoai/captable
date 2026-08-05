@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@hanzo/ui";
+import { cn } from "@hanzo/ui";
 
 type DonutSelectorProps = {
   selected: string;

@@ -1,5 +1,5 @@
 import { COLORS } from "@/constants/esign";
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 interface DrawingFieldProps {
   color: string;
   left: number;

@@ -1,10 +1,6 @@
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@hanzo/ui";
 import { COLORS } from "@/constants/esign";
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 import type { ComponentProps, ReactNode } from "react";
 
 interface useMeasurementProps {

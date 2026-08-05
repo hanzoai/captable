@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@hanzo/ui";
 import { parseInviteMembersCSV } from "@/lib/invite-team-members-csv-parser";
 import { api } from "@/trpc/react";
 import type { TypeZodInviteMemberArrayMutationSchema } from "@/trpc/routers/member-router/schema";

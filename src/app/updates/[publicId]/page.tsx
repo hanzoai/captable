@@ -1,6 +1,6 @@
+import { Avatar, AvatarImage } from "@hanzo/ui";
 import { dayjsExt } from "@/common/dayjs";
 import { SharePageLayout } from "@/components/share/page-layout";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import UpdateRenderer from "@/components/update/renderer";
 import { type JWTVerifyResult, decode } from "@/lib/jwt";
 import { UpdateStatusEnum } from "@/prisma/enums";

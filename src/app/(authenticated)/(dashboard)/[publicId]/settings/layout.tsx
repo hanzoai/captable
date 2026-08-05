@@ -1,6 +1,6 @@
+import { Card } from "@hanzo/ui";
 import { PageLayout } from "@/components/dashboard/page-layout";
 import { SettingsSidebar } from "@/components/settings/settings-sidebar";
-import { Card } from "@/components/ui/card";
 import { IS_BILLING_ENABLED } from "@/constants/stripe";
 
 const SettingsLayout = ({ children }: { children: React.ReactNode }) => {

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@hanzo/ui";
 import type { ComponentProps } from "react";
 
 interface PricingButtonProps
