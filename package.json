@@ -141,7 +141,7 @@
     "inquirer": "^14.2.0",
     "knip": "^6.33.0",
     "lint-staged": "^17.4.1",
-    "postcss": "^8.5.26",
+    "postcss": "^8.5.28",
     "prisma": "^8.0.0-rc.12",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.12",
