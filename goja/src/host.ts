@@ -4,19 +4,22 @@
 // goja runtime before calling handle():
 //
 //   globalThis.__db.query(sql, args)  -> row objects        (SELECT)
-//   globalThis.__db.exec(sql, args)   -> { changes, lastId } (INSERT/UPDATE/DELETE)
+//   globalThis.__db.exec(sql, args)   -> { changes }          (INSERT/UPDATE/DELETE)
 //   globalThis.__newId()              -> a fresh collision-resistant id
 //   globalThis.__now()                -> unix milliseconds (host clock)
 //
 // There is NO Prisma, NO tRPC, NO next-auth and NO node: builtin in this path.
-// Persistence is per-tenant Base/SQLite, owned by the Go host; this bundle only
-// issues SQL through the bridge. Every query is already inside ONE tenant's
+// Persistence is a per-tenant store (a SQLite file, or a schema of hanzo-sql),
+// owned by the Go host; this bundle only issues SQL through the bridge, in the
+// dialect both engines share: $n placeholders in the order they first appear,
+// BIGINT integers, and a quoted "camelCase" alias where a column is renamed to one
+// (PostgreSQL folds an unquoted name to lower case). Every query is already inside ONE tenant's
 // database file, and additionally carries the company_id column for defence in
 // depth (mirrors the tRPC `where: { companyId }` scope).
 
 export interface Db {
   query(sql: string, args: unknown[]): Record<string, unknown>[];
-  exec(sql: string, args: unknown[]): { changes: number; lastId: string };
+  exec(sql: string, args: unknown[]): { changes: number };
 }
 
 declare global {

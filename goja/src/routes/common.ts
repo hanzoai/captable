@@ -39,7 +39,7 @@ export function asObj(body: unknown): Record<string, unknown> {
 export function refExists(companyId: string, table: string, id: string): boolean {
   if (!id) return false;
   return (
-    db.query(`SELECT 1 FROM ${table} WHERE company_id = ? AND id = ?`, [
+    db.query(`SELECT 1 FROM ${table} WHERE company_id = $1 AND id = $2`, [
       companyId,
       id,
     ]).length > 0

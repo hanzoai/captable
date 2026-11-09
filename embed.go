@@ -18,7 +18,7 @@ import _ "embed"
 
 // Version identifies the embedded bundle for the host's mount log. Bump on any
 // change to goja/bundle.js.
-const Version = "0.1.0"
+const Version = "0.1.1"
 
 //go:embed goja/bundle.js
 var bundle []byte

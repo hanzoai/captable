@@ -19,17 +19,17 @@ import * as v from "../validate";
 
 export function listShareClasses(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT sc.id, sc.idx, sc.name, sc.class_type AS classType, sc.prefix,
-            sc.initial_shares_authorized AS initialSharesAuthorized,
-            sc.votes_per_share AS votesPerShare, sc.par_value AS parValue,
-            sc.price_per_share AS pricePerShare, sc.seniority,
-            sc.conversion_rights AS conversionRights,
-            sc.liquidation_preference_multiple AS liquidationPreferenceMultiple,
-            sc.participation_cap_multiple AS participationCapMultiple,
-            c.name AS companyName
+    `SELECT sc.id, sc.idx, sc.name, sc.class_type AS "classType", sc.prefix,
+            sc.initial_shares_authorized AS "initialSharesAuthorized",
+            sc.votes_per_share AS "votesPerShare", sc.par_value AS "parValue",
+            sc.price_per_share AS "pricePerShare", sc.seniority,
+            sc.conversion_rights AS "conversionRights",
+            sc.liquidation_preference_multiple AS "liquidationPreferenceMultiple",
+            sc.participation_cap_multiple AS "participationCapMultiple",
+            c.name AS "companyName"
        FROM share_class sc
        JOIN company c ON c.id = sc.company_id
-      WHERE sc.company_id = ?
+      WHERE sc.company_id = $1
       ORDER BY sc.idx ASC`,
     [ctx.companyId],
   );
@@ -63,7 +63,7 @@ export function createShareClass(ctx: Ctx): Res {
 
   // idx auto-increments per company (tRPC: count(where companyId) + 1).
   const countRows = db.query(
-    `SELECT COUNT(*) AS n FROM share_class WHERE company_id = ?`,
+    `SELECT COUNT(*) AS n FROM share_class WHERE company_id = $1`,
     [ctx.companyId],
   );
   const idx = Number((countRows[0] as { n: number }).n) + 1;
@@ -75,7 +75,7 @@ export function createShareClass(ctx: Ctx): Res {
         votes_per_share, par_value, price_per_share, seniority, conversion_rights,
         converts_to_share_class_id, liquidation_preference_multiple,
         participation_cap_multiple, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
     [
       newId(),
       ctx.companyId,
@@ -109,13 +109,13 @@ export function updateShareClass(ctx: Ctx): Res {
   if (errs.length) return badReq(errs);
   const r = db.exec(
     `UPDATE share_class
-        SET name = ?, class_type = ?, prefix = ?, initial_shares_authorized = ?,
-            board_approval_date = ?, stockholder_approval_date = ?,
-            votes_per_share = ?, par_value = ?, price_per_share = ?, seniority = ?,
-            conversion_rights = ?, converts_to_share_class_id = ?,
-            liquidation_preference_multiple = ?, participation_cap_multiple = ?,
-            updated_at = ?
-      WHERE company_id = ? AND id = ?`,
+        SET name = $1, class_type = $2, prefix = $3, initial_shares_authorized = $4,
+            board_approval_date = $5, stockholder_approval_date = $6,
+            votes_per_share = $7, par_value = $8, price_per_share = $9, seniority = $10,
+            conversion_rights = $11, converts_to_share_class_id = $12,
+            liquidation_preference_multiple = $13, participation_cap_multiple = $14,
+            updated_at = $15
+      WHERE company_id = $16 AND id = $17`,
     [
       s.name,
       s.classType,
@@ -144,12 +144,12 @@ export function updateShareClass(ctx: Ctx): Res {
 
 export function listEquityPlans(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT id, name, board_approval_date AS boardApprovalDate,
-            plan_effective_date AS planEffectiveDate,
-            initial_shares_reserved AS initialSharesReserved,
-            default_cancellation_behavior AS defaultCancellatonBehavior,
-            share_class_id AS shareClassId, comments, created_at AS createdAt
-       FROM equity_plan WHERE company_id = ?
+    `SELECT id, name, board_approval_date AS "boardApprovalDate",
+            plan_effective_date AS "planEffectiveDate",
+            initial_shares_reserved AS "initialSharesReserved",
+            default_cancellation_behavior AS "defaultCancellatonBehavior",
+            share_class_id AS "shareClassId", comments, created_at AS "createdAt"
+       FROM equity_plan WHERE company_id = $1
       ORDER BY created_at DESC`,
     [ctx.companyId],
   );
@@ -175,7 +175,7 @@ export function createEquityPlan(ctx: Ctx): Res {
        (id, company_id, name, board_approval_date, plan_effective_date,
         initial_shares_reserved, default_cancellation_behavior, share_class_id,
         comments, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
     [
       newId(),
       ctx.companyId,

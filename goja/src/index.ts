@@ -5,7 +5,7 @@
 // hanzoai/cloud (HIP-0106), hosted by clients/gojabase — the reusable
 // read-write-Base binding. See goja/README.md for the full host contract.
 //
-//   globalThis.__db   = { query(sql,args)->rows, exec(sql,args)->{changes,lastId} }
+//   globalThis.__db   = { query(sql,args)->rows, exec(sql,args)->{changes} }
 //   globalThis.__newId = () => string
 //   globalThis.__now   = () => number   (unix millis)
 //   globalThis.handle({ route, params, orgId, session, body }) -> { status, body }

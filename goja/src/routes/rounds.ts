@@ -21,12 +21,12 @@ import { insertShare } from "./securities";
 
 export function listRounds(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT id, name, round_type AS roundType, status,
-            target_amount AS targetAmount, raised_amount AS raisedAmount,
-            pre_money_valuation AS preMoneyValuation,
-            price_per_share AS pricePerShare, share_class_id AS shareClassId,
-            close_date AS closeDate, created_at AS createdAt
-       FROM round WHERE company_id = ?
+    `SELECT id, name, round_type AS "roundType", status,
+            target_amount AS "targetAmount", raised_amount AS "raisedAmount",
+            pre_money_valuation AS "preMoneyValuation",
+            price_per_share AS "pricePerShare", share_class_id AS "shareClassId",
+            close_date AS "closeDate", created_at AS "createdAt"
+       FROM round WHERE company_id = $1
       ORDER BY created_at DESC`,
     [ctx.companyId],
   );
@@ -63,7 +63,7 @@ export function createRound(ctx: Ctx): Res {
        (id, company_id, name, round_type, status, target_amount, raised_amount,
         pre_money_valuation, price_per_share, share_class_id, close_date,
         created_at, updated_at)
-     VALUES (?,?,?,?, 'OPEN', ?, 0, ?, ?, ?, NULL, ?, ?)`,
+     VALUES ($1,$2,$3,$4, 'OPEN', $5, 0, $6, $7, $8, NULL, $9, $10)`,
     [id, ctx.companyId, name, roundType, targetAmount, preMoney, pricePerShare, shareClassId, ts, ts],
   );
   return created({ success: true, message: "Round created.", id });
@@ -73,21 +73,21 @@ export function getRound(ctx: Ctx): Res {
   const id = ctx.params.id;
   if (!id) return badReq(["round id is required"]);
   const rows = db.query(
-    `SELECT id, name, round_type AS roundType, status,
-            target_amount AS targetAmount, raised_amount AS raisedAmount,
-            pre_money_valuation AS preMoneyValuation,
-            price_per_share AS pricePerShare, share_class_id AS shareClassId,
-            close_date AS closeDate, created_at AS createdAt
-       FROM round WHERE company_id = ? AND id = ?`,
+    `SELECT id, name, round_type AS "roundType", status,
+            target_amount AS "targetAmount", raised_amount AS "raisedAmount",
+            pre_money_valuation AS "preMoneyValuation",
+            price_per_share AS "pricePerShare", share_class_id AS "shareClassId",
+            close_date AS "closeDate", created_at AS "createdAt"
+       FROM round WHERE company_id = $1 AND id = $2`,
     [ctx.companyId, id],
   );
   if (rows.length === 0) return notFound("round not found");
   const investments = db.query(
     `SELECT i.id, i.amount, i.shares, i.date, i.comments,
-            st.name AS stakeholderName, st.id AS stakeholderId
+            st.name AS "stakeholderName", st.id AS "stakeholderId"
        FROM investment i
        JOIN stakeholder st ON st.id = i.stakeholder_id
-      WHERE i.company_id = ? AND i.round_id = ?
+      WHERE i.company_id = $1 AND i.round_id = $2
       ORDER BY i.created_at ASC`,
     [ctx.companyId, id],
   );
@@ -101,8 +101,8 @@ export function closeRound(ctx: Ctx): Res {
   const o = asObj(ctx.body);
   const closeDate = v.optDateString(o, "closeDate") || new Date(now()).toISOString().slice(0, 10);
   const r = db.exec(
-    `UPDATE round SET status = 'CLOSED', close_date = ?, updated_at = ?
-      WHERE company_id = ? AND id = ? AND status = 'OPEN'`,
+    `UPDATE round SET status = 'CLOSED', close_date = $1, updated_at = $2
+      WHERE company_id = $3 AND id = $4 AND status = 'OPEN'`,
     [closeDate, now(), ctx.companyId, id],
   );
   if (r.changes === 0) return notFound("open round not found");
@@ -111,12 +111,12 @@ export function closeRound(ctx: Ctx): Res {
 
 export function listInvestments(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT i.id, i.round_id AS roundId, i.amount, i.shares, i.date,
-            i.share_class_id AS shareClassId, st.name AS stakeholderName,
-            st.id AS stakeholderId
+    `SELECT i.id, i.round_id AS "roundId", i.amount, i.shares, i.date,
+            i.share_class_id AS "shareClassId", st.name AS "stakeholderName",
+            st.id AS "stakeholderId"
        FROM investment i
        JOIN stakeholder st ON st.id = i.stakeholder_id
-      WHERE i.company_id = ?
+      WHERE i.company_id = $1
       ORDER BY i.created_at DESC`,
     [ctx.companyId],
   );
@@ -138,9 +138,9 @@ export function addInvestment(ctx: Ctx): Res {
   if (errs.length) return badReq(errs);
 
   const roundRows = db.query(
-    `SELECT id, round_type AS roundType, status, price_per_share AS pricePerShare,
-            share_class_id AS shareClassId
-       FROM round WHERE company_id = ? AND id = ?`,
+    `SELECT id, round_type AS "roundType", status, price_per_share AS "pricePerShare",
+            share_class_id AS "shareClassId"
+       FROM round WHERE company_id = $1 AND id = $2`,
     [ctx.companyId, roundId],
   );
   if (roundRows.length === 0) return notFound("round not found");
@@ -191,7 +191,7 @@ export function addInvestment(ctx: Ctx): Res {
     `INSERT INTO investment
        (id, company_id, round_id, stakeholder_id, share_class_id, amount, shares,
         date, comments, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
     [
       invId,
       ctx.companyId,
@@ -207,7 +207,7 @@ export function addInvestment(ctx: Ctx): Res {
     ],
   );
   db.exec(
-    `UPDATE round SET raised_amount = raised_amount + ?, updated_at = ? WHERE company_id = ? AND id = ?`,
+    `UPDATE round SET raised_amount = raised_amount + $1, updated_at = $2 WHERE company_id = $3 AND id = $4`,
     [amount, ts, ctx.companyId, roundId],
   );
   return created({

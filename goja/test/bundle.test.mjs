@@ -173,10 +173,10 @@ it("capTable → 200 with totals + sections", () => {
 it("shares.transfer full → 200 + UPDATE stakeholder_id", () => {
   const { db, calls } = makeDb({
     // source share lookup, then the recipient existence check.
-    "FROM share WHERE company_id = ? AND id = ?": [
+    "FROM share WHERE company_id = $1 AND id = $2": [
       { id: "sh1", stakeholderId: "s1", shareClassId: "c1", quantity: 100, status: "ACTIVE", certificateId: "CS-1" },
     ],
-    "SELECT 1 FROM stakeholder WHERE company_id = ? AND id = ?": [{ 1: 1 }],
+    "SELECT 1 FROM stakeholder WHERE company_id = $1 AND id = $2": [{ 1: 1 }],
   });
   const handle = runBundle(db);
   const res = handle({

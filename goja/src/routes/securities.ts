@@ -21,17 +21,17 @@ import * as v from "../validate";
 
 export function listShares(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT sh.id, sh.certificate_id AS certificateId, sh.quantity,
-            sh.price_per_share AS pricePerShare,
-            sh.capital_contribution AS capitalContribution,
-            sh.status, sh.issue_date AS issueDate,
-            sh.company_legends AS companyLegends,
-            st.name AS stakeholderName, st.id AS stakeholderId,
-            sc.class_type AS shareClassType, sc.id AS shareClassId, sc.name AS shareClassName
+    `SELECT sh.id, sh.certificate_id AS "certificateId", sh.quantity,
+            sh.price_per_share AS "pricePerShare",
+            sh.capital_contribution AS "capitalContribution",
+            sh.status, sh.issue_date AS "issueDate",
+            sh.company_legends AS "companyLegends",
+            st.name AS "stakeholderName", st.id AS "stakeholderId",
+            sc.class_type AS "shareClassType", sc.id AS "shareClassId", sc.name AS "shareClassName"
        FROM share sh
        JOIN stakeholder st ON st.id = sh.stakeholder_id
        JOIN share_class sc ON sc.id = sh.share_class_id
-      WHERE sh.company_id = ?
+      WHERE sh.company_id = $1
       ORDER BY sh.created_at DESC`,
     [ctx.companyId],
   );
@@ -78,7 +78,7 @@ export function insertShare(
         debt_cancelled, other_contributions, cliff_years, vesting_years,
         company_legends, issue_date, rule144_date, vesting_start_date,
         board_approval_date, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,
     [
       id,
       companyId,
@@ -137,7 +137,7 @@ export function addShare(ctx: Ctx): Res {
     return badReq(["shareClassId does not reference a share class in this company"]);
   }
   if (
-    db.query(`SELECT 1 FROM share WHERE company_id = ? AND certificate_id = ?`, [
+    db.query(`SELECT 1 FROM share WHERE company_id = $1 AND certificate_id = $2`, [
       ctx.companyId,
       certificateId,
     ]).length > 0
@@ -159,7 +159,7 @@ export function addShare(ctx: Ctx): Res {
 export function deleteShare(ctx: Ctx): Res {
   const id = ctx.params.id;
   if (!id) return badReq(["share id is required"]);
-  const r = db.exec(`DELETE FROM share WHERE company_id = ? AND id = ?`, [
+  const r = db.exec(`DELETE FROM share WHERE company_id = $1 AND id = $2`, [
     ctx.companyId,
     id,
   ]);
@@ -179,9 +179,9 @@ export function transferShare(ctx: Ctx): Res {
   if (errs.length) return badReq(errs);
 
   const rows = db.query(
-    `SELECT id, stakeholder_id AS stakeholderId, share_class_id AS shareClassId,
-            quantity, status, certificate_id AS certificateId
-       FROM share WHERE company_id = ? AND id = ?`,
+    `SELECT id, stakeholder_id AS "stakeholderId", share_class_id AS "shareClassId",
+            quantity, status, certificate_id AS "certificateId"
+       FROM share WHERE company_id = $1 AND id = $2`,
     [ctx.companyId, shareId],
   );
   if (rows.length === 0) return notFound("share not found");
@@ -206,7 +206,7 @@ export function transferShare(ctx: Ctx): Res {
   if (qty === held) {
     // Full transfer: reassign the certificate.
     db.exec(
-      `UPDATE share SET stakeholder_id = ?, updated_at = ? WHERE company_id = ? AND id = ?`,
+      `UPDATE share SET stakeholder_id = $1, updated_at = $2 WHERE company_id = $3 AND id = $4`,
       [toStakeholderId, now(), ctx.companyId, shareId],
     );
     return okRes({
@@ -223,14 +223,14 @@ export function transferShare(ctx: Ctx): Res {
     return badReq(["certificateId is required for a partial transfer"]);
   }
   if (
-    db.query(`SELECT 1 FROM share WHERE company_id = ? AND certificate_id = ?`, [
+    db.query(`SELECT 1 FROM share WHERE company_id = $1 AND certificate_id = $2`, [
       ctx.companyId,
       newCert,
     ]).length > 0
   ) {
     return conflict("Please use unique Certificate Id.");
   }
-  db.exec(`UPDATE share SET quantity = ?, updated_at = ? WHERE company_id = ? AND id = ?`, [
+  db.exec(`UPDATE share SET quantity = $1, updated_at = $2 WHERE company_id = $3 AND id = $4`, [
     held - qty,
     now(),
     ctx.companyId,
@@ -267,16 +267,16 @@ export function transferShare(ctx: Ctx): Res {
 
 export function listOptions(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT o.id, o.grant_id AS grantId, o.quantity,
-            o.exercise_price AS exercisePrice, o.type, o.status,
-            o.cliff_years AS cliffYears, o.vesting_years AS vestingYears,
-            o.issue_date AS issueDate, o.expiration_date AS expirationDate,
-            st.name AS stakeholderName, st.id AS stakeholderId,
-            ep.name AS equityPlanName, ep.id AS equityPlanId
+    `SELECT o.id, o.grant_id AS "grantId", o.quantity,
+            o.exercise_price AS "exercisePrice", o.type, o.status,
+            o.cliff_years AS "cliffYears", o.vesting_years AS "vestingYears",
+            o.issue_date AS "issueDate", o.expiration_date AS "expirationDate",
+            st.name AS "stakeholderName", st.id AS "stakeholderId",
+            ep.name AS "equityPlanName", ep.id AS "equityPlanId"
        FROM option o
        JOIN stakeholder st ON st.id = o.stakeholder_id
        JOIN equity_plan ep ON ep.id = o.equity_plan_id
-      WHERE o.company_id = ?
+      WHERE o.company_id = $1
       ORDER BY o.created_at DESC`,
     [ctx.companyId],
   );
@@ -312,7 +312,7 @@ export function addOption(ctx: Ctx): Res {
     return badReq(["equityPlanId does not reference an equity plan in this company"]);
   }
   if (
-    db.query(`SELECT 1 FROM option WHERE company_id = ? AND grant_id = ?`, [
+    db.query(`SELECT 1 FROM option WHERE company_id = $1 AND grant_id = $2`, [
       ctx.companyId,
       grantId,
     ]).length > 0
@@ -326,7 +326,7 @@ export function addOption(ctx: Ctx): Res {
         exercise_price, type, status, cliff_years, vesting_years, issue_date,
         expiration_date, vesting_start_date, board_approval_date, rule144_date,
         created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
     [
       newId(),
       ctx.companyId,
@@ -355,7 +355,7 @@ export function addOption(ctx: Ctx): Res {
 export function deleteOption(ctx: Ctx): Res {
   const id = ctx.params.id;
   if (!id) return badReq(["option id is required"]);
-  const r = db.exec(`DELETE FROM option WHERE company_id = ? AND id = ?`, [
+  const r = db.exec(`DELETE FROM option WHERE company_id = $1 AND id = $2`, [
     ctx.companyId,
     id,
   ]);

@@ -23,12 +23,19 @@ first dispatch, then calls `handle` per request:
 
 ```
 globalThis.__db.query(sql, args)  -> row objects          (SELECT)
-globalThis.__db.exec(sql, args)   -> { changes, lastId }   (INSERT/UPDATE/DELETE)
+globalThis.__db.exec(sql, args)   -> { changes }            (INSERT/UPDATE/DELETE)
 globalThis.__newId()              -> collision-resistant id
 globalThis.__now()                -> unix milliseconds
 
 globalThis.handle({ route, params, orgId, session, body }) -> { status, body }
 ```
+
+The SQL a bundle issues is the dialect SQLite and PostgreSQL share, so one bundle
+runs on a tenant's SQLite file and on a schema of hanzo-sql: `$n` placeholders in
+the order they first appear, `INSERT ... ON CONFLICT`, `BIGINT` integers, a quoted
+`"camelCase"` alias where a column is renamed to one (PostgreSQL folds an unquoted
+name to lower case), and a text argument that is always a string. There is no
+`lastId`: PostgreSQL has none, and a bundle makes its own ids with `__newId`.
 
 `orgId` is the gateway-minted, **validated** tenant. The host uses it BOTH to
 select the per-tenant SQLite file AND passes it here as the cap-table

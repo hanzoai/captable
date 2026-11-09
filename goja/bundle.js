@@ -55,7 +55,7 @@
   }
   function refExists(companyId, table, id) {
     if (!id) return false;
-    return db.query(`SELECT 1 FROM ${table} WHERE company_id = ? AND id = ?`, [
+    return db.query(`SELECT 1 FROM ${table} WHERE company_id = $1 AND id = $2`, [
       companyId,
       id
     ]).length > 0;
@@ -203,11 +203,11 @@
   // src/routes/company.ts
   function getCompany(ctx) {
     const rows = db.query(
-      `SELECT id, name, public_id AS publicId, incorporation_type AS incorporationType,
-            incorporation_country AS incorporationCountry,
-            incorporation_state AS incorporationState,
-            created_at AS createdAt, updated_at AS updatedAt
-       FROM company WHERE id = ?`,
+      `SELECT id, name, public_id AS "publicId", incorporation_type AS "incorporationType",
+            incorporation_country AS "incorporationCountry",
+            incorporation_state AS "incorporationState",
+            created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM company WHERE id = $1`,
       [ctx.companyId]
     );
     if (rows.length === 0) return notFound("company not found");
@@ -220,9 +220,9 @@
     if (errs.length) return badReq(errs);
     const r = db.exec(
       `UPDATE company
-        SET name = ?, incorporation_type = ?, incorporation_country = ?,
-            incorporation_state = ?, updated_at = ?
-      WHERE id = ?`,
+        SET name = $1, incorporation_type = $2, incorporation_country = $3,
+            incorporation_state = $4, updated_at = $5
+      WHERE id = $6`,
       [
         name,
         optString(o, "incorporationType") || "",
@@ -239,15 +239,15 @@
   // src/routes/stakeholders.ts
   function listStakeholders(ctx) {
     const rows = db.query(
-      `SELECT s.id, s.name, s.email, s.institution_name AS institutionName,
-            s.stakeholder_type AS stakeholderType,
-            s.current_relationship AS currentRelationship,
-            s.tax_id AS taxId, s.street_address AS streetAddress, s.city,
-            s.state, s.zipcode, s.country, s.created_at AS createdAt,
-            c.name AS companyName
+      `SELECT s.id, s.name, s.email, s.institution_name AS "institutionName",
+            s.stakeholder_type AS "stakeholderType",
+            s.current_relationship AS "currentRelationship",
+            s.tax_id AS "taxId", s.street_address AS "streetAddress", s.city,
+            s.state, s.zipcode, s.country, s.created_at AS "createdAt",
+            c.name AS "companyName"
        FROM stakeholder s
        JOIN company c ON c.id = s.company_id
-      WHERE s.company_id = ?
+      WHERE s.company_id = $1
       ORDER BY s.created_at DESC`,
       [ctx.companyId]
     );
@@ -285,7 +285,7 @@
     let inserted = 0;
     for (const s of parsed) {
       const dup = db.query(
-        `SELECT 1 FROM stakeholder WHERE company_id = ? AND email = ?`,
+        `SELECT 1 FROM stakeholder WHERE company_id = $1 AND email = $2`,
         [ctx.companyId, s.email]
       );
       if (dup.length > 0) continue;
@@ -294,7 +294,7 @@
          (id, company_id, name, email, institution_name, stakeholder_type,
           current_relationship, tax_id, street_address, city, state, zipcode,
           country, created_at, updated_at)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
         [
           newId(),
           ctx.companyId,
@@ -327,6 +327,10 @@
     const o = asObj(ctx.body);
     const sets = [];
     const args = [];
+    const at = (v) => {
+      args.push(v);
+      return `$${args.length}`;
+    };
     const map = [
       ["name", "name"],
       ["email", "email"],
@@ -339,17 +343,21 @@
       ["state", "state"],
       ["zipcode", "zipcode"]
     ];
+    const errs = [];
     for (const [jsonKey, col] of map) {
-      if (o[jsonKey] !== void 0) {
-        sets.push(`${col} = ?`);
-        args.push(o[jsonKey]);
+      const value = o[jsonKey];
+      if (value === void 0) continue;
+      if (value !== null && typeof value === "object") {
+        errs.push(`${jsonKey} must be a string`);
+        continue;
       }
+      sets.push(`${col} = ${at(value === null ? null : String(value))}`);
     }
+    if (errs.length) return badReq(errs);
     if (sets.length === 0) return badReq(["no fields to update"]);
-    sets.push("updated_at = ?");
-    args.push(now(), ctx.companyId, id);
+    sets.push(`updated_at = ${at(now())}`);
     const r = db.exec(
-      `UPDATE stakeholder SET ${sets.join(", ")} WHERE company_id = ? AND id = ?`,
+      `UPDATE stakeholder SET ${sets.join(", ")} WHERE company_id = ${at(ctx.companyId)} AND id = ${at(id)}`,
       args
     );
     if (r.changes === 0) return notFound("stakeholder not found");
@@ -359,14 +367,14 @@
     const id = ctx.params.id;
     if (!id) return badReq(["stakeholder id is required"]);
     const held = db.query(
-      `SELECT (SELECT COUNT(*) FROM share  WHERE stakeholder_id = ? AND company_id = ?)
-          + (SELECT COUNT(*) FROM option WHERE stakeholder_id = ? AND company_id = ?) AS n`,
+      `SELECT (SELECT COUNT(*) FROM share  WHERE stakeholder_id = $1 AND company_id = $2)
+          + (SELECT COUNT(*) FROM option WHERE stakeholder_id = $3 AND company_id = $4) AS n`,
       [id, ctx.companyId, id, ctx.companyId]
     );
     if (Number(held[0].n) > 0) {
       return badReq(["cannot delete a stakeholder that still holds shares or options"]);
     }
-    const r = db.exec(`DELETE FROM stakeholder WHERE company_id = ? AND id = ?`, [
+    const r = db.exec(`DELETE FROM stakeholder WHERE company_id = $1 AND id = $2`, [
       ctx.companyId,
       id
     ]);
@@ -377,17 +385,17 @@
   // src/routes/equity.ts
   function listShareClasses(ctx) {
     const rows = db.query(
-      `SELECT sc.id, sc.idx, sc.name, sc.class_type AS classType, sc.prefix,
-            sc.initial_shares_authorized AS initialSharesAuthorized,
-            sc.votes_per_share AS votesPerShare, sc.par_value AS parValue,
-            sc.price_per_share AS pricePerShare, sc.seniority,
-            sc.conversion_rights AS conversionRights,
-            sc.liquidation_preference_multiple AS liquidationPreferenceMultiple,
-            sc.participation_cap_multiple AS participationCapMultiple,
-            c.name AS companyName
+      `SELECT sc.id, sc.idx, sc.name, sc.class_type AS "classType", sc.prefix,
+            sc.initial_shares_authorized AS "initialSharesAuthorized",
+            sc.votes_per_share AS "votesPerShare", sc.par_value AS "parValue",
+            sc.price_per_share AS "pricePerShare", sc.seniority,
+            sc.conversion_rights AS "conversionRights",
+            sc.liquidation_preference_multiple AS "liquidationPreferenceMultiple",
+            sc.participation_cap_multiple AS "participationCapMultiple",
+            c.name AS "companyName"
        FROM share_class sc
        JOIN company c ON c.id = sc.company_id
-      WHERE sc.company_id = ?
+      WHERE sc.company_id = $1
       ORDER BY sc.idx ASC`,
       [ctx.companyId]
     );
@@ -417,7 +425,7 @@
     const s = validateShareClass(asObj(ctx.body), errs);
     if (errs.length) return badReq(errs);
     const countRows = db.query(
-      `SELECT COUNT(*) AS n FROM share_class WHERE company_id = ?`,
+      `SELECT COUNT(*) AS n FROM share_class WHERE company_id = $1`,
       [ctx.companyId]
     );
     const idx = Number(countRows[0].n) + 1;
@@ -429,7 +437,7 @@
         votes_per_share, par_value, price_per_share, seniority, conversion_rights,
         converts_to_share_class_id, liquidation_preference_multiple,
         participation_cap_multiple, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
       [
         newId(),
         ctx.companyId,
@@ -462,13 +470,13 @@
     if (errs.length) return badReq(errs);
     const r = db.exec(
       `UPDATE share_class
-        SET name = ?, class_type = ?, prefix = ?, initial_shares_authorized = ?,
-            board_approval_date = ?, stockholder_approval_date = ?,
-            votes_per_share = ?, par_value = ?, price_per_share = ?, seniority = ?,
-            conversion_rights = ?, converts_to_share_class_id = ?,
-            liquidation_preference_multiple = ?, participation_cap_multiple = ?,
-            updated_at = ?
-      WHERE company_id = ? AND id = ?`,
+        SET name = $1, class_type = $2, prefix = $3, initial_shares_authorized = $4,
+            board_approval_date = $5, stockholder_approval_date = $6,
+            votes_per_share = $7, par_value = $8, price_per_share = $9, seniority = $10,
+            conversion_rights = $11, converts_to_share_class_id = $12,
+            liquidation_preference_multiple = $13, participation_cap_multiple = $14,
+            updated_at = $15
+      WHERE company_id = $16 AND id = $17`,
       [
         s.name,
         s.classType,
@@ -494,12 +502,12 @@
   }
   function listEquityPlans(ctx) {
     const rows = db.query(
-      `SELECT id, name, board_approval_date AS boardApprovalDate,
-            plan_effective_date AS planEffectiveDate,
-            initial_shares_reserved AS initialSharesReserved,
-            default_cancellation_behavior AS defaultCancellatonBehavior,
-            share_class_id AS shareClassId, comments, created_at AS createdAt
-       FROM equity_plan WHERE company_id = ?
+      `SELECT id, name, board_approval_date AS "boardApprovalDate",
+            plan_effective_date AS "planEffectiveDate",
+            initial_shares_reserved AS "initialSharesReserved",
+            default_cancellation_behavior AS "defaultCancellatonBehavior",
+            share_class_id AS "shareClassId", comments, created_at AS "createdAt"
+       FROM equity_plan WHERE company_id = $1
       ORDER BY created_at DESC`,
       [ctx.companyId]
     );
@@ -523,7 +531,7 @@
        (id, company_id, name, board_approval_date, plan_effective_date,
         initial_shares_reserved, default_cancellation_behavior, share_class_id,
         comments, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
       [
         newId(),
         ctx.companyId,
@@ -544,17 +552,17 @@
   // src/routes/securities.ts
   function listShares(ctx) {
     const rows = db.query(
-      `SELECT sh.id, sh.certificate_id AS certificateId, sh.quantity,
-            sh.price_per_share AS pricePerShare,
-            sh.capital_contribution AS capitalContribution,
-            sh.status, sh.issue_date AS issueDate,
-            sh.company_legends AS companyLegends,
-            st.name AS stakeholderName, st.id AS stakeholderId,
-            sc.class_type AS shareClassType, sc.id AS shareClassId, sc.name AS shareClassName
+      `SELECT sh.id, sh.certificate_id AS "certificateId", sh.quantity,
+            sh.price_per_share AS "pricePerShare",
+            sh.capital_contribution AS "capitalContribution",
+            sh.status, sh.issue_date AS "issueDate",
+            sh.company_legends AS "companyLegends",
+            st.name AS "stakeholderName", st.id AS "stakeholderId",
+            sc.class_type AS "shareClassType", sc.id AS "shareClassId", sc.name AS "shareClassName"
        FROM share sh
        JOIN stakeholder st ON st.id = sh.stakeholder_id
        JOIN share_class sc ON sc.id = sh.share_class_id
-      WHERE sh.company_id = ?
+      WHERE sh.company_id = $1
       ORDER BY sh.created_at DESC`,
       [ctx.companyId]
     );
@@ -577,7 +585,7 @@
         debt_cancelled, other_contributions, cliff_years, vesting_years,
         company_legends, issue_date, rule144_date, vesting_start_date,
         board_approval_date, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,
       [
         id,
         companyId,
@@ -633,7 +641,7 @@
     if (!refExists(ctx.companyId, "share_class", shareClassId)) {
       return badReq(["shareClassId does not reference a share class in this company"]);
     }
-    if (db.query(`SELECT 1 FROM share WHERE company_id = ? AND certificate_id = ?`, [
+    if (db.query(`SELECT 1 FROM share WHERE company_id = $1 AND certificate_id = $2`, [
       ctx.companyId,
       certificateId
     ]).length > 0) {
@@ -651,7 +659,7 @@
   function deleteShare(ctx) {
     const id = ctx.params.id;
     if (!id) return badReq(["share id is required"]);
-    const r = db.exec(`DELETE FROM share WHERE company_id = ? AND id = ?`, [
+    const r = db.exec(`DELETE FROM share WHERE company_id = $1 AND id = $2`, [
       ctx.companyId,
       id
     ]);
@@ -665,9 +673,9 @@
     const toStakeholderId = reqString(o, "toStakeholderId", errs);
     if (errs.length) return badReq(errs);
     const rows = db.query(
-      `SELECT id, stakeholder_id AS stakeholderId, share_class_id AS shareClassId,
-            quantity, status, certificate_id AS certificateId
-       FROM share WHERE company_id = ? AND id = ?`,
+      `SELECT id, stakeholder_id AS "stakeholderId", share_class_id AS "shareClassId",
+            quantity, status, certificate_id AS "certificateId"
+       FROM share WHERE company_id = $1 AND id = $2`,
       [ctx.companyId, shareId]
     );
     if (rows.length === 0) return notFound("share not found");
@@ -683,7 +691,7 @@
     }
     if (qty === held) {
       db.exec(
-        `UPDATE share SET stakeholder_id = ?, updated_at = ? WHERE company_id = ? AND id = ?`,
+        `UPDATE share SET stakeholder_id = $1, updated_at = $2 WHERE company_id = $3 AND id = $4`,
         [toStakeholderId, now(), ctx.companyId, shareId]
       );
       return okRes({
@@ -697,13 +705,13 @@
     if (!newCert) {
       return badReq(["certificateId is required for a partial transfer"]);
     }
-    if (db.query(`SELECT 1 FROM share WHERE company_id = ? AND certificate_id = ?`, [
+    if (db.query(`SELECT 1 FROM share WHERE company_id = $1 AND certificate_id = $2`, [
       ctx.companyId,
       newCert
     ]).length > 0) {
       return conflict("Please use unique Certificate Id.");
     }
-    db.exec(`UPDATE share SET quantity = ?, updated_at = ? WHERE company_id = ? AND id = ?`, [
+    db.exec(`UPDATE share SET quantity = $1, updated_at = $2 WHERE company_id = $3 AND id = $4`, [
       held - qty,
       now(),
       ctx.companyId,
@@ -737,16 +745,16 @@
   }
   function listOptions(ctx) {
     const rows = db.query(
-      `SELECT o.id, o.grant_id AS grantId, o.quantity,
-            o.exercise_price AS exercisePrice, o.type, o.status,
-            o.cliff_years AS cliffYears, o.vesting_years AS vestingYears,
-            o.issue_date AS issueDate, o.expiration_date AS expirationDate,
-            st.name AS stakeholderName, st.id AS stakeholderId,
-            ep.name AS equityPlanName, ep.id AS equityPlanId
+      `SELECT o.id, o.grant_id AS "grantId", o.quantity,
+            o.exercise_price AS "exercisePrice", o.type, o.status,
+            o.cliff_years AS "cliffYears", o.vesting_years AS "vestingYears",
+            o.issue_date AS "issueDate", o.expiration_date AS "expirationDate",
+            st.name AS "stakeholderName", st.id AS "stakeholderId",
+            ep.name AS "equityPlanName", ep.id AS "equityPlanId"
        FROM option o
        JOIN stakeholder st ON st.id = o.stakeholder_id
        JOIN equity_plan ep ON ep.id = o.equity_plan_id
-      WHERE o.company_id = ?
+      WHERE o.company_id = $1
       ORDER BY o.created_at DESC`,
       [ctx.companyId]
     );
@@ -779,7 +787,7 @@
     if (!refExists(ctx.companyId, "equity_plan", equityPlanId)) {
       return badReq(["equityPlanId does not reference an equity plan in this company"]);
     }
-    if (db.query(`SELECT 1 FROM option WHERE company_id = ? AND grant_id = ?`, [
+    if (db.query(`SELECT 1 FROM option WHERE company_id = $1 AND grant_id = $2`, [
       ctx.companyId,
       grantId
     ]).length > 0) {
@@ -792,7 +800,7 @@
         exercise_price, type, status, cliff_years, vesting_years, issue_date,
         expiration_date, vesting_start_date, board_approval_date, rule144_date,
         created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
       [
         newId(),
         ctx.companyId,
@@ -820,7 +828,7 @@
   function deleteOption(ctx) {
     const id = ctx.params.id;
     if (!id) return badReq(["option id is required"]);
-    const r = db.exec(`DELETE FROM option WHERE company_id = ? AND id = ?`, [
+    const r = db.exec(`DELETE FROM option WHERE company_id = $1 AND id = $2`, [
       ctx.companyId,
       id
     ]);
@@ -831,13 +839,13 @@
   // src/routes/convertibles.ts
   function listSafes(ctx) {
     const rows = db.query(
-      `SELECT sf.id, sf.public_id AS publicId, sf.type, sf.status, sf.capital,
-            sf.valuation_cap AS valuationCap, sf.discount_rate AS discountRate,
-            sf.mfn, sf.pro_rata AS proRata, sf.issue_date AS issueDate,
-            st.name AS stakeholderName, st.id AS stakeholderId
+      `SELECT sf.id, sf.public_id AS "publicId", sf.type, sf.status, sf.capital,
+            sf.valuation_cap AS "valuationCap", sf.discount_rate AS "discountRate",
+            sf.mfn, sf.pro_rata AS "proRata", sf.issue_date AS "issueDate",
+            st.name AS "stakeholderName", st.id AS "stakeholderId"
        FROM safe sf
        JOIN stakeholder st ON st.id = sf.stakeholder_id
-      WHERE sf.company_id = ?
+      WHERE sf.company_id = $1
       ORDER BY sf.created_at DESC`,
       [ctx.companyId]
     );
@@ -861,7 +869,7 @@
     if (!refExists(ctx.companyId, "stakeholder", stakeholderId)) {
       return badReq(["stakeholderId does not reference a stakeholder in this company"]);
     }
-    if (db.query(`SELECT 1 FROM safe WHERE company_id = ? AND public_id = ?`, [
+    if (db.query(`SELECT 1 FROM safe WHERE company_id = $1 AND public_id = $2`, [
       ctx.companyId,
       publicId
     ]).length > 0) {
@@ -873,7 +881,7 @@
        (id, company_id, stakeholder_id, public_id, type, status, capital,
         valuation_cap, discount_rate, mfn, pro_rata, additional_terms,
         issue_date, board_approval_date, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
       [
         newId(),
         ctx.companyId,
@@ -898,7 +906,7 @@
   function deleteSafe(ctx) {
     const id = ctx.params.id;
     if (!id) return badReq(["safe id is required"]);
-    const r = db.exec(`DELETE FROM safe WHERE company_id = ? AND id = ?`, [
+    const r = db.exec(`DELETE FROM safe WHERE company_id = $1 AND id = $2`, [
       ctx.companyId,
       id
     ]);
@@ -907,13 +915,13 @@
   }
   function listConvertibles(ctx) {
     const rows = db.query(
-      `SELECT cn.id, cn.public_id AS publicId, cn.type, cn.status, cn.capital,
-            cn.conversion_cap AS conversionCap, cn.discount_rate AS discountRate,
-            cn.interest_rate AS interestRate, cn.issue_date AS issueDate,
-            st.name AS stakeholderName, st.id AS stakeholderId
+      `SELECT cn.id, cn.public_id AS "publicId", cn.type, cn.status, cn.capital,
+            cn.conversion_cap AS "conversionCap", cn.discount_rate AS "discountRate",
+            cn.interest_rate AS "interestRate", cn.issue_date AS "issueDate",
+            st.name AS "stakeholderName", st.id AS "stakeholderId"
        FROM convertible_note cn
        JOIN stakeholder st ON st.id = cn.stakeholder_id
-      WHERE cn.company_id = ?
+      WHERE cn.company_id = $1
       ORDER BY cn.created_at DESC`,
       [ctx.companyId]
     );
@@ -933,7 +941,7 @@
     if (!refExists(ctx.companyId, "stakeholder", stakeholderId)) {
       return badReq(["stakeholderId does not reference a stakeholder in this company"]);
     }
-    if (db.query(`SELECT 1 FROM convertible_note WHERE company_id = ? AND public_id = ?`, [
+    if (db.query(`SELECT 1 FROM convertible_note WHERE company_id = $1 AND public_id = $2`, [
       ctx.companyId,
       publicId
     ]).length > 0) {
@@ -945,7 +953,7 @@
        (id, company_id, stakeholder_id, public_id, type, status, capital,
         conversion_cap, discount_rate, mfn, interest_rate, additional_terms,
         issue_date, board_approval_date, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
       [
         newId(),
         ctx.companyId,
@@ -970,7 +978,7 @@
   function deleteConvertible(ctx) {
     const id = ctx.params.id;
     if (!id) return badReq(["convertible note id is required"]);
-    const r = db.exec(`DELETE FROM convertible_note WHERE company_id = ? AND id = ?`, [
+    const r = db.exec(`DELETE FROM convertible_note WHERE company_id = $1 AND id = $2`, [
       ctx.companyId,
       id
     ]);
@@ -981,12 +989,12 @@
   // src/routes/rounds.ts
   function listRounds(ctx) {
     const rows = db.query(
-      `SELECT id, name, round_type AS roundType, status,
-            target_amount AS targetAmount, raised_amount AS raisedAmount,
-            pre_money_valuation AS preMoneyValuation,
-            price_per_share AS pricePerShare, share_class_id AS shareClassId,
-            close_date AS closeDate, created_at AS createdAt
-       FROM round WHERE company_id = ?
+      `SELECT id, name, round_type AS "roundType", status,
+            target_amount AS "targetAmount", raised_amount AS "raisedAmount",
+            pre_money_valuation AS "preMoneyValuation",
+            price_per_share AS "pricePerShare", share_class_id AS "shareClassId",
+            close_date AS "closeDate", created_at AS "createdAt"
+       FROM round WHERE company_id = $1
       ORDER BY created_at DESC`,
       [ctx.companyId]
     );
@@ -1020,7 +1028,7 @@
        (id, company_id, name, round_type, status, target_amount, raised_amount,
         pre_money_valuation, price_per_share, share_class_id, close_date,
         created_at, updated_at)
-     VALUES (?,?,?,?, 'OPEN', ?, 0, ?, ?, ?, NULL, ?, ?)`,
+     VALUES ($1,$2,$3,$4, 'OPEN', $5, 0, $6, $7, $8, NULL, $9, $10)`,
       [id, ctx.companyId, name, roundType, targetAmount, preMoney, pricePerShare, shareClassId, ts, ts]
     );
     return created({ success: true, message: "Round created.", id });
@@ -1029,21 +1037,21 @@
     const id = ctx.params.id;
     if (!id) return badReq(["round id is required"]);
     const rows = db.query(
-      `SELECT id, name, round_type AS roundType, status,
-            target_amount AS targetAmount, raised_amount AS raisedAmount,
-            pre_money_valuation AS preMoneyValuation,
-            price_per_share AS pricePerShare, share_class_id AS shareClassId,
-            close_date AS closeDate, created_at AS createdAt
-       FROM round WHERE company_id = ? AND id = ?`,
+      `SELECT id, name, round_type AS "roundType", status,
+            target_amount AS "targetAmount", raised_amount AS "raisedAmount",
+            pre_money_valuation AS "preMoneyValuation",
+            price_per_share AS "pricePerShare", share_class_id AS "shareClassId",
+            close_date AS "closeDate", created_at AS "createdAt"
+       FROM round WHERE company_id = $1 AND id = $2`,
       [ctx.companyId, id]
     );
     if (rows.length === 0) return notFound("round not found");
     const investments = db.query(
       `SELECT i.id, i.amount, i.shares, i.date, i.comments,
-            st.name AS stakeholderName, st.id AS stakeholderId
+            st.name AS "stakeholderName", st.id AS "stakeholderId"
        FROM investment i
        JOIN stakeholder st ON st.id = i.stakeholder_id
-      WHERE i.company_id = ? AND i.round_id = ?
+      WHERE i.company_id = $1 AND i.round_id = $2
       ORDER BY i.created_at ASC`,
       [ctx.companyId, id]
     );
@@ -1056,8 +1064,8 @@
     const o = asObj(ctx.body);
     const closeDate = optDateString(o, "closeDate") || new Date(now()).toISOString().slice(0, 10);
     const r = db.exec(
-      `UPDATE round SET status = 'CLOSED', close_date = ?, updated_at = ?
-      WHERE company_id = ? AND id = ? AND status = 'OPEN'`,
+      `UPDATE round SET status = 'CLOSED', close_date = $1, updated_at = $2
+      WHERE company_id = $3 AND id = $4 AND status = 'OPEN'`,
       [closeDate, now(), ctx.companyId, id]
     );
     if (r.changes === 0) return notFound("open round not found");
@@ -1065,12 +1073,12 @@
   }
   function listInvestments(ctx) {
     const rows = db.query(
-      `SELECT i.id, i.round_id AS roundId, i.amount, i.shares, i.date,
-            i.share_class_id AS shareClassId, st.name AS stakeholderName,
-            st.id AS stakeholderId
+      `SELECT i.id, i.round_id AS "roundId", i.amount, i.shares, i.date,
+            i.share_class_id AS "shareClassId", st.name AS "stakeholderName",
+            st.id AS "stakeholderId"
        FROM investment i
        JOIN stakeholder st ON st.id = i.stakeholder_id
-      WHERE i.company_id = ?
+      WHERE i.company_id = $1
       ORDER BY i.created_at DESC`,
       [ctx.companyId]
     );
@@ -1086,9 +1094,9 @@
     const amount = num(o, "amount", errs, 0);
     if (errs.length) return badReq(errs);
     const roundRows = db.query(
-      `SELECT id, round_type AS roundType, status, price_per_share AS pricePerShare,
-            share_class_id AS shareClassId
-       FROM round WHERE company_id = ? AND id = ?`,
+      `SELECT id, round_type AS "roundType", status, price_per_share AS "pricePerShare",
+            share_class_id AS "shareClassId"
+       FROM round WHERE company_id = $1 AND id = $2`,
       [ctx.companyId, roundId]
     );
     if (roundRows.length === 0) return notFound("round not found");
@@ -1131,7 +1139,7 @@
       `INSERT INTO investment
        (id, company_id, round_id, stakeholder_id, share_class_id, amount, shares,
         date, comments, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
       [
         invId,
         ctx.companyId,
@@ -1147,7 +1155,7 @@
       ]
     );
     db.exec(
-      `UPDATE round SET raised_amount = raised_amount + ?, updated_at = ? WHERE company_id = ? AND id = ?`,
+      `UPDATE round SET raised_amount = raised_amount + $1, updated_at = $2 WHERE company_id = $3 AND id = $4`,
       [amount, ts, ctx.companyId, roundId]
     );
     return created({
@@ -1163,27 +1171,27 @@
   var DILUTIVE_OPTION_STATUS = `status NOT IN ('EXERCISED','EXPIRED','CANCELLED')`;
   function capTable(ctx) {
     const cid = ctx.companyId;
-    const company = db.query(`SELECT id, name FROM company WHERE id = ?`, [cid]);
+    const company = db.query(`SELECT id, name FROM company WHERE id = $1`, [cid]);
     if (company.length === 0) return notFound("company not found");
     const num2 = (rows, key) => rows.length ? Number(rows[0][key]) : 0;
     const outstanding = num2(
-      db.query(`SELECT COALESCE(SUM(quantity),0) AS n FROM share WHERE company_id = ?`, [cid]),
+      db.query(`SELECT CAST(COALESCE(SUM(quantity),0) AS BIGINT) AS n FROM share WHERE company_id = $1`, [cid]),
       "n"
     );
     const optionShares = num2(
       db.query(
-        `SELECT COALESCE(SUM(quantity),0) AS n FROM option WHERE company_id = ? AND ${DILUTIVE_OPTION_STATUS}`,
+        `SELECT CAST(COALESCE(SUM(quantity),0) AS BIGINT) AS n FROM option WHERE company_id = $1 AND ${DILUTIVE_OPTION_STATUS}`,
         [cid]
       ),
       "n"
     );
     const fullyDiluted = outstanding + optionShares;
     const byStakeholder = db.query(
-      `SELECT st.id AS stakeholderId, st.name,
-            COALESCE((SELECT SUM(sh.quantity) FROM share  sh WHERE sh.stakeholder_id = st.id AND sh.company_id = st.company_id), 0) AS shares,
-            COALESCE((SELECT SUM(op.quantity) FROM option op WHERE op.stakeholder_id = st.id AND op.company_id = st.company_id AND op.${DILUTIVE_OPTION_STATUS}), 0) AS options
+      `SELECT st.id AS "stakeholderId", st.name,
+            CAST(COALESCE((SELECT SUM(sh.quantity) FROM share  sh WHERE sh.stakeholder_id = st.id AND sh.company_id = st.company_id), 0) AS BIGINT) AS shares,
+            CAST(COALESCE((SELECT SUM(op.quantity) FROM option op WHERE op.stakeholder_id = st.id AND op.company_id = st.company_id AND op.${DILUTIVE_OPTION_STATUS}), 0) AS BIGINT) AS options
        FROM stakeholder st
-      WHERE st.company_id = ?
+      WHERE st.company_id = $1
       ORDER BY shares DESC, options DESC`,
       [cid]
     );
@@ -1197,11 +1205,11 @@
       r.ownershipPct = fullyDiluted > 0 ? Math.round(held / fullyDiluted * 1e4) / 100 : 0;
     }
     const byShareClass = db.query(
-      `SELECT sc.id AS shareClassId, sc.name, sc.class_type AS classType,
+      `SELECT sc.id AS "shareClassId", sc.name, sc.class_type AS "classType",
             sc.initial_shares_authorized AS authorized,
-            COALESCE((SELECT SUM(sh.quantity) FROM share sh WHERE sh.share_class_id = sc.id AND sh.company_id = sc.company_id), 0) AS issued
+            CAST(COALESCE((SELECT SUM(sh.quantity) FROM share sh WHERE sh.share_class_id = sc.id AND sh.company_id = sc.company_id), 0) AS BIGINT) AS issued
        FROM share_class sc
-      WHERE sc.company_id = ?
+      WHERE sc.company_id = $1
       ORDER BY sc.idx ASC`,
       [cid]
     );
@@ -1211,17 +1219,17 @@
     }
     const convertibles = {
       safes: {
-        count: num2(db.query(`SELECT COUNT(*) AS n FROM safe WHERE company_id = ?`, [cid]), "n"),
-        capital: num2(db.query(`SELECT COALESCE(SUM(capital),0) AS n FROM safe WHERE company_id = ?`, [cid]), "n")
+        count: num2(db.query(`SELECT COUNT(*) AS n FROM safe WHERE company_id = $1`, [cid]), "n"),
+        capital: num2(db.query(`SELECT COALESCE(SUM(capital),0) AS n FROM safe WHERE company_id = $1`, [cid]), "n")
       },
       notes: {
-        count: num2(db.query(`SELECT COUNT(*) AS n FROM convertible_note WHERE company_id = ?`, [cid]), "n"),
-        capital: num2(db.query(`SELECT COALESCE(SUM(capital),0) AS n FROM convertible_note WHERE company_id = ?`, [cid]), "n")
+        count: num2(db.query(`SELECT COUNT(*) AS n FROM convertible_note WHERE company_id = $1`, [cid]), "n"),
+        capital: num2(db.query(`SELECT COALESCE(SUM(capital),0) AS n FROM convertible_note WHERE company_id = $1`, [cid]), "n")
       }
     };
     const rounds = {
-      count: num2(db.query(`SELECT COUNT(*) AS n FROM round WHERE company_id = ?`, [cid]), "n"),
-      totalRaised: num2(db.query(`SELECT COALESCE(SUM(raised_amount),0) AS n FROM round WHERE company_id = ?`, [cid]), "n")
+      count: num2(db.query(`SELECT COUNT(*) AS n FROM round WHERE company_id = $1`, [cid]), "n"),
+      totalRaised: num2(db.query(`SELECT COALESCE(SUM(raised_amount),0) AS n FROM round WHERE company_id = $1`, [cid]), "n")
     };
     return okRes({
       company: company[0],
@@ -1229,8 +1237,8 @@
         outstandingShares: outstanding,
         grantedOptions: optionShares,
         fullyDilutedShares: fullyDiluted,
-        stakeholders: num2(db.query(`SELECT COUNT(*) AS n FROM stakeholder WHERE company_id = ?`, [cid]), "n"),
-        shareClasses: num2(db.query(`SELECT COUNT(*) AS n FROM share_class WHERE company_id = ?`, [cid]), "n")
+        stakeholders: num2(db.query(`SELECT COUNT(*) AS n FROM stakeholder WHERE company_id = $1`, [cid]), "n"),
+        shareClasses: num2(db.query(`SELECT COUNT(*) AS n FROM share_class WHERE company_id = $1`, [cid]), "n")
       },
       byStakeholder,
       byShareClass,

@@ -20,13 +20,13 @@ import * as v from "../validate";
 
 export function listSafes(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT sf.id, sf.public_id AS publicId, sf.type, sf.status, sf.capital,
-            sf.valuation_cap AS valuationCap, sf.discount_rate AS discountRate,
-            sf.mfn, sf.pro_rata AS proRata, sf.issue_date AS issueDate,
-            st.name AS stakeholderName, st.id AS stakeholderId
+    `SELECT sf.id, sf.public_id AS "publicId", sf.type, sf.status, sf.capital,
+            sf.valuation_cap AS "valuationCap", sf.discount_rate AS "discountRate",
+            sf.mfn, sf.pro_rata AS "proRata", sf.issue_date AS "issueDate",
+            st.name AS "stakeholderName", st.id AS "stakeholderId"
        FROM safe sf
        JOIN stakeholder st ON st.id = sf.stakeholder_id
-      WHERE sf.company_id = ?
+      WHERE sf.company_id = $1
       ORDER BY sf.created_at DESC`,
     [ctx.companyId],
   );
@@ -53,7 +53,7 @@ export function createSafe(ctx: Ctx): Res {
     return badReq(["stakeholderId does not reference a stakeholder in this company"]);
   }
   if (
-    db.query(`SELECT 1 FROM safe WHERE company_id = ? AND public_id = ?`, [
+    db.query(`SELECT 1 FROM safe WHERE company_id = $1 AND public_id = $2`, [
       ctx.companyId,
       publicId,
     ]).length > 0
@@ -66,7 +66,7 @@ export function createSafe(ctx: Ctx): Res {
        (id, company_id, stakeholder_id, public_id, type, status, capital,
         valuation_cap, discount_rate, mfn, pro_rata, additional_terms,
         issue_date, board_approval_date, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
     [
       newId(),
       ctx.companyId,
@@ -92,7 +92,7 @@ export function createSafe(ctx: Ctx): Res {
 export function deleteSafe(ctx: Ctx): Res {
   const id = ctx.params.id;
   if (!id) return badReq(["safe id is required"]);
-  const r = db.exec(`DELETE FROM safe WHERE company_id = ? AND id = ?`, [
+  const r = db.exec(`DELETE FROM safe WHERE company_id = $1 AND id = $2`, [
     ctx.companyId,
     id,
   ]);
@@ -104,13 +104,13 @@ export function deleteSafe(ctx: Ctx): Res {
 
 export function listConvertibles(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT cn.id, cn.public_id AS publicId, cn.type, cn.status, cn.capital,
-            cn.conversion_cap AS conversionCap, cn.discount_rate AS discountRate,
-            cn.interest_rate AS interestRate, cn.issue_date AS issueDate,
-            st.name AS stakeholderName, st.id AS stakeholderId
+    `SELECT cn.id, cn.public_id AS "publicId", cn.type, cn.status, cn.capital,
+            cn.conversion_cap AS "conversionCap", cn.discount_rate AS "discountRate",
+            cn.interest_rate AS "interestRate", cn.issue_date AS "issueDate",
+            st.name AS "stakeholderName", st.id AS "stakeholderId"
        FROM convertible_note cn
        JOIN stakeholder st ON st.id = cn.stakeholder_id
-      WHERE cn.company_id = ?
+      WHERE cn.company_id = $1
       ORDER BY cn.created_at DESC`,
     [ctx.companyId],
   );
@@ -133,7 +133,7 @@ export function createConvertible(ctx: Ctx): Res {
     return badReq(["stakeholderId does not reference a stakeholder in this company"]);
   }
   if (
-    db.query(`SELECT 1 FROM convertible_note WHERE company_id = ? AND public_id = ?`, [
+    db.query(`SELECT 1 FROM convertible_note WHERE company_id = $1 AND public_id = $2`, [
       ctx.companyId,
       publicId,
     ]).length > 0
@@ -146,7 +146,7 @@ export function createConvertible(ctx: Ctx): Res {
        (id, company_id, stakeholder_id, public_id, type, status, capital,
         conversion_cap, discount_rate, mfn, interest_rate, additional_terms,
         issue_date, board_approval_date, created_at, updated_at)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
     [
       newId(),
       ctx.companyId,
@@ -172,7 +172,7 @@ export function createConvertible(ctx: Ctx): Res {
 export function deleteConvertible(ctx: Ctx): Res {
   const id = ctx.params.id;
   if (!id) return badReq(["convertible note id is required"]);
-  const r = db.exec(`DELETE FROM convertible_note WHERE company_id = ? AND id = ?`, [
+  const r = db.exec(`DELETE FROM convertible_note WHERE company_id = $1 AND id = $2`, [
     ctx.companyId,
     id,
   ]);

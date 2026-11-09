@@ -7,11 +7,11 @@ import * as v from "../validate";
 
 export function getCompany(ctx: Ctx): Res {
   const rows = db.query(
-    `SELECT id, name, public_id AS publicId, incorporation_type AS incorporationType,
-            incorporation_country AS incorporationCountry,
-            incorporation_state AS incorporationState,
-            created_at AS createdAt, updated_at AS updatedAt
-       FROM company WHERE id = ?`,
+    `SELECT id, name, public_id AS "publicId", incorporation_type AS "incorporationType",
+            incorporation_country AS "incorporationCountry",
+            incorporation_state AS "incorporationState",
+            created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM company WHERE id = $1`,
     [ctx.companyId],
   );
   if (rows.length === 0) return notFound("company not found");
@@ -25,9 +25,9 @@ export function updateCompany(ctx: Ctx): Res {
   if (errs.length) return badReq(errs);
   const r = db.exec(
     `UPDATE company
-        SET name = ?, incorporation_type = ?, incorporation_country = ?,
-            incorporation_state = ?, updated_at = ?
-      WHERE id = ?`,
+        SET name = $1, incorporation_type = $2, incorporation_country = $3,
+            incorporation_state = $4, updated_at = $5
+      WHERE id = $6`,
     [
       name,
       v.optString(o, "incorporationType") || "",
