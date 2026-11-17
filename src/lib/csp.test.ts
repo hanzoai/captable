@@ -14,11 +14,16 @@ const directive = (name: string) =>
     .split(" ");
 
 describe("contentSecurityPolicy", () => {
-  it("defaults to the app's own origin and refuses plugins, framing and base rewrites", () => {
+  it("defaults to the app's own origin and refuses plugins, base rewrites", () => {
     expect(directive("default-src")).toEqual(["'self'"]);
     expect(directive("object-src")).toEqual(["'none'"]);
-    expect(directive("frame-ancestors")).toEqual(["'none'"]);
     expect(directive("base-uri")).toEqual(["'self'"]);
+  });
+
+  it("lets the app embed itself and hanzo.team, and refuses arbitrary origins", () => {
+    const ancestors = directive("frame-ancestors");
+    expect(ancestors).toEqual(["'self'", "https://hanzo.team"]);
+    expect(ancestors).not.toContain("*");
   });
 
   it("loads script from the app's origin alone", () => {
