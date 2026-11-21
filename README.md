@@ -11,6 +11,9 @@
 </a>
 
 <h1 align="center">Hanzo Captable</h1>
+
+[![Open in Hanzo](https://hanzo.app/badges/open-in-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/captable&ref=main&action=open) [![Edit with Hanzo](https://hanzo.app/badges/edit-with-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/captable&ref=main&action=edit) [![Deploy with Hanzo](https://hanzo.app/badges/deploy-with-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/captable&ref=main&action=deploy)
+
 <p align="center">
   #1 Open-source Cap table management platform, an alternative to Carta, Pulley, Angelist and others.
 </p>
