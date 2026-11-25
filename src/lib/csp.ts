@@ -53,7 +53,9 @@ export const contentSecurityPolicy = ({ store, iam, sentry }: CspOrigins) => {
     "worker-src": ["'self'", "blob:"],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
-    "frame-ancestors": ["'none'"],
+    // The app may be embedded on hanzo.team and on itself; not on arbitrary
+    // origins.
+    "frame-ancestors": ["'self'", "https://hanzo.team"],
   };
   return Object.entries(directives)
     .map(([name, sources]) => `${name} ${[...new Set(sources)].join(" ")}`)
