@@ -41,7 +41,7 @@ describe("share links", () => {
   it("are minted only by the mutations that mail them", () => {
     const mints = files(src).flatMap((f) => {
       const n = (readFileSync(f, "utf8").match(/encodeShare\(/g) ?? []).length;
-      return n ? [`${relative(root, f)} ${n}`] : [];
+      return n ? [`${relative(root, f).replace(/\\/g, "/")} ${n}`] : [];
     });
     // add-fields is the signing link, which EncodeEmailToken wraps for the
     // signing mail and the next signer's mail alike.

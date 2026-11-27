@@ -4,4 +4,7 @@ import { defineConfig } from "vitest/config";
 // same way, so a component renders under vitest exactly as the app builds it.
 export default defineConfig({
   esbuild: { jsx: "automatic" },
+  test: {
+    exclude: ["**/node_modules/**", "**/dist/**", "goja/**"],
+  },
 });

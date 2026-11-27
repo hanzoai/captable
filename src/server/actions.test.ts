@@ -24,7 +24,7 @@ describe("server actions", () => {
   it("are declared in storage.ts and nowhere else", () => {
     const modules = files(src)
       .filter((f) => USE_SERVER.test(readFileSync(f, "utf8")))
-      .map((f) => relative(root, f));
+      .map((f) => relative(root, f).replace(/\\/g, "/"));
     expect(modules).toEqual(["src/server/storage.ts"]);
   });
 
