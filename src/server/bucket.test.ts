@@ -30,9 +30,9 @@ describe("bucket ownership", () => {
         (f) =>
           /\binput\.(?:bucketId|document\.bucketId|documents)\b|doc\.bucketId/.test(
             read(f),
-          ) || /procedures\/create-(?:document|template)\.ts$/.test(f),
+          ) || /procedures[\\/]create-(?:document|template)\.ts$/.test(f),
       )
-      .map((f) => relative(root, f))
+      .map((f) => relative(root, f).replace(/\\/g, "/"))
       .sort();
     expect(takers).toEqual([
       "src/trpc/routers/document-router/procedures/create-document.ts",
@@ -50,7 +50,7 @@ describe("bucket ownership", () => {
   it("is checked before a GET is signed for a company's document", () => {
     const signers = files(src)
       .filter((f) => /getPresignedGetUrl\(/.test(read(f)))
-      .map((f) => relative(root, f))
+      .map((f) => relative(root, f).replace(/\\/g, "/"))
       .sort();
     // file-uploads defines it; bucket.ts is the checked path; the e-sign job and
     // the two template reads sign what a company-scoped template row names.
